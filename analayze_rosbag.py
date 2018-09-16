@@ -80,7 +80,10 @@ for f in files:
                                 main=int(main)
                                 number_of_secondary=2
 
-                            data[subject_id][section_id][turn] = {'secondary_robots_data':{}, 'main':main, 'number_of_secondary':number_of_secondary}
+                            data[subject_id][section_id][turn] = {'secondary_robots_data':{}, 'main':main,
+                                                                  'number_of_secondary':number_of_secondary,'tracking_data':{'time':[],
+                                                                                                                             'direction':[],
+                                                                                                                             'informative':[]}}
 
                             # collect eye tracker data on the turn
                             collect_tracker = {0: True, 1: True, 2: True}
@@ -140,6 +143,14 @@ for f in files:
 
                     if collect_tracker[position]:
                         tracker_dict[position]+=1
+
+                        # data[subject_id][section_id][turn]['tracking_data']['time'].append(###time)
+                        data[subject_id][section_id][turn]['tracking_data']['direction'].append(position)
+                        data[subject_id][section_id][turn]['tracking_data']['informative'].append(collect_secondary_robots[position])
+
+
+
+
 
                 #give number of robot that are secondery
 
