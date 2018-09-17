@@ -80,5 +80,19 @@ AQ_score=AQ_scoring(AQ_data)
 
 
 #personal_info:
+personal_info_data=pt_1_data[['pt1uniqueID','concent','age', 'Q20', 'city', 'email', 'psychometric', 'grades avg.','Q24']]
+
+#validation
+personal_info_data=personal_info_data[personal_info_data.concent=='1']
+
+personal_info_data.columns = ['pt1uniqueID']+['concent','age', 'gender', 'city', 'email', 'pet', 'avg_grades','faculty']
+
+# for col in list ['pt1uniqueID','concent','age', 'gender','pet', 'avg_grades']:
+#        personal_info_data[col] = personal_info_data[col].astype(float)
+
+
+
+
+print personal_info_data
 
 
