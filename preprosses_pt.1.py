@@ -1,8 +1,13 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+sys.path.append("utils_for_questioners")
+from AQ_scoring import AQ_scoring
+from BFI_scoring import BFI_scoring
 
-pt_1_data=pd.read_csv('data/qualtrics/pt.1/Pt.1_September+16%2C+2018_03.08.csv')
+
+pt_1_data=pd.read_csv('data/qualtrics/pt.1/Pt.1_September+17%2C+2018_02.01.csv')
 
 all_c=['StartDate', 'EndDate', 'Status', 'IPAddress', 'Progress', 'Duration (in seconds)',
        'Finished', 'RecordedDate', 'ResponseId', 'RecipientLastName', 'RecipientFirstName', 'RecipientEmail',
@@ -30,24 +35,50 @@ all_c=['StartDate', 'EndDate', 'Status', 'IPAddress', 'Progress', 'Duration (in 
        'BFI_30', 'BFI_31', 'BFI_32', 'BFI_33', 'BFI_34', 'BFI_35', 'BFI_36', 'BFI_37', 'BFI_38', 'BFI_39', 'BFI_40', 'BFI_41', 'BFI_42', 'BFI_43', 'BFI_44',
        'SC0', 'email.1', 'fname', 'pt1uniqueID', 'pt1uniqueID - Topics']
 
-#
-# #preprocessing:
-# columns= ['Duration (in seconds)','Finished','RecordedDate','Q1.2','Q1.3','Q1.4','Q1.5','Q0_11','Q1_11','Q2_11','Q3_11','Q4_11','Q5_11',
-#           'Q6_11','Q7_11','Q8_11','Q9_11','Q10_11','Q11_11','Q12_11','Q13_11','Q14_11','validation_11']
-# columns_names= ['duration','finished','date','agree_to_participate','gender','age','degree','0','1','2','3','4','5',
-#                 '6','7','8','9','10','11','12','13','14','validation']
-#
-# remove_ferst_two_lines:#
+
+
+
+# remove_ferst_two_lines:
 pt_1_data=pt_1_data.drop([0,1])
 
-print list(pt_1_data)
+#remove subject with no pt1uniqueID (did not finish):
+pt_1_data=pt_1_data[pd.notnull(pt_1_data['pt1uniqueID'])]
 
-#
-# #columns_names
-# AMT_data=AMT_data[columns]
-# AMT_data.columns=columns_names
-#
-# #to numeric:
-# final_list= list(set(columns_names).difference(set(['finished','date','agree_to_participate','gender','degree'])))
-# for col in final_list:
-#     AMT_data[col] = AMT_data[col].astype(float)
+
+##BFI data
+BFI_data=pt_1_data[['pt1uniqueID','BFI_1', 'BFI_2', 'BFI_3', 'BFI_4', 'BFI_5', 'BFI_6', 'BFI_7', 'BFI_8', 'BFI_9', 'BFI_10', 'BFI_11', 'BFI_12', 'BFI_13',
+       'BFI_14', 'BFI_15', 'BFI_16', 'BFI_17', 'BFI_18', 'BFI_19', 'BFI_20', 'BFI_21', 'BFI_22', 'BFI_23', 'BFI_24', 'BFI_25', 'BFI_26', 'BFI_27', 'BFI_28', 'BFI_29',
+       'BFI_30', 'BFI_31', 'BFI_32', 'BFI_33', 'BFI_34', 'BFI_35', 'BFI_36', 'BFI_37', 'BFI_38', 'BFI_39', 'BFI_40', 'BFI_41', 'BFI_42', 'BFI_43', 'BFI_44']]
+
+BFI_data.columns = ['pt1uniqueID']+[i for i in xrange(1,45)]
+
+for col in list(BFI_data):
+       BFI_data[col] = BFI_data[col].astype(float)
+
+BFI_data.set_index('pt1uniqueID',inplace=True)
+
+
+# scoring:
+BFI_score=BFI_scoring(BFI_data)
+
+
+##AQ data:
+AQ_data=pt_1_data[['pt1uniqueID','AQ_1', 'AQ_2', 'AQ_3', 'AQ_4', 'AQ_5', 'AQ_6', 'AQ_7', 'AQ_8', 'AQ_9', 'AQ_10', 'AQ_11', 'AQ_12',
+       'AQ_13', 'AQ_14', 'AQ_15', 'AQ_16', 'AQ_17', 'AQ_18', 'AQ_19', 'AQ_20', 'AQ_21', 'AQ_22', 'AQ_23', 'AQ_24', 'AQ_25', 'AQ_26',
+       'AQ_27', 'AQ_28', 'AQ_29','AQ_30', 'AQ_31', 'AQ_32', 'AQ_33', 'AQ_34', 'AQ_35', 'AQ_36', 'AQ_37', 'AQ_38', 'AQ_39', 'AQ_40',
+       'AQ_41', 'AQ_42', 'AQ_43', 'AQ_44', 'AQ_45', 'AQ_46','AQ_47', 'AQ_48', 'AQ_49', 'AQ_50']]
+
+AQ_data.columns = ['pt1uniqueID']+[i for i in xrange(1,51)]
+
+for col in list(AQ_data):
+       AQ_data[col] = AQ_data[col].astype(float)
+
+AQ_data.set_index('pt1uniqueID',inplace=True)
+
+#scoring:
+AQ_score=AQ_scoring(AQ_data)
+
+
+#personal_info:
+
+
