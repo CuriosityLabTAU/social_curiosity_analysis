@@ -4,6 +4,7 @@ from os import listdir
 from os.path import isfile, join
 import numpy as np
 import json
+import datetime
 
 # get a list of all the relevant bag files
 mypath = '/home/matan/Desktop/social_curiosity_data/'
@@ -134,6 +135,11 @@ for f in files:
                         tracker_dict = {0: 0, 1: 0, 2: 0}
                         collect_tracker = {0: False, 1: False, 2: False}
 
+                        #normalize time
+                        first_time=data[subject_id][section_id][turn]['tracking_data']['time'][0]
+
+                        data[subject_id][section_id][turn]['tracking_data']['time']=[(x - first_time).to_sec() for x in data[subject_id][section_id][turn]['tracking_data']['time']]
+
 
                 if 'eye_tracking' in topic:
                     direction=msg.data
@@ -144,23 +150,17 @@ for f in files:
                     if collect_tracker[position]:
                         tracker_dict[position]+=1
 
-                        # data[subject_id][section_id][turn]['tracking_data']['time'].append(###time)
+                        data[subject_id][section_id][turn]['tracking_data']['time'].append(t)
                         data[subject_id][section_id][turn]['tracking_data']['direction'].append(position)
                         data[subject_id][section_id][turn]['tracking_data']['informative'].append(collect_secondary_robots[position])
-
-
-
-
-
-                #give number of robot that are secondery
 
         except:
             print('error - subject_id: ',subject_id)
             data.pop(subject_id)
 
 
-print data
 
-# print(data.keys())
+#save data
+time_now = datetime.datetime.now().strftime("%d-%m-%Y_%H:%M")
 
-# pickle.dump(obj=data, file=open('data/raw_data_28_6', 'wb'))#
+pickle.dump(obj=data, file=open('data/robot_interaction_data/raw_data_'+time_now, 'wb'))
