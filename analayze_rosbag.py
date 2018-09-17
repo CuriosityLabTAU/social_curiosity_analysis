@@ -6,6 +6,100 @@ import numpy as np
 import json
 import datetime
 
+
+behaviors_dict = {
+       0: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/close_hands']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/close_hands']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/close_hands']}]},
+
+       1: {
+              "left": [{'action': 'look_to_other_way', 'parameters': ['left']}],
+              "center": [{'action': 'look_to_other_way', 'parameters': ['center']}],
+              "right": [{'action': 'look_to_other_way', 'parameters': ['right']}]},
+
+       2: {
+              "left": [{'action': 'disagree'}],
+              "center": [{'action': 'disagree'}],
+              "right": [{'action': 'disagree'}]},
+
+       3: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/neutral']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/neutral']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/neutral']}]},
+
+       4: {
+              "left": [{'action': 'move_to_pose', 'parameters': ['left']}],
+              "center": [{'action': 'move_to_pose', 'parameters': ['center']}],
+              "right": [{'action': 'move_to_pose', 'parameters': ['right']}]},
+
+       5: {
+              "left": [{'action': 'agree'}],
+              "center": [{'action': 'agree'}],
+              "right": [{'action': 'agree'}]},
+
+       6: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/open_hands']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/open_hands']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/open_hands']}]},
+
+       7: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/right_forward']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/center_forward']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/left_forward']}]},
+
+       8: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/hate_left']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/hate_center']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/hate_center']}]},
+
+       9: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/right_hand_behind_head_left']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/left_hand_behind_head_center']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/left_hand_behind_head_right']}]},
+
+       10: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/left_lean_back']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/center_hand_lean_forward']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/right_lean_back']}]},
+
+       11: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/left_hand_random']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/right_hand_random']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/right_hand_random']}]},
+
+       12: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/right_hand_random']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/left_hand_random']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/left_hand_random']}]},
+
+       13: {
+              "left": [{'action': 'run_behavior', 'parameters': ['social_curiosity/hate_2']}],
+              "center": [{'action': 'run_behavior', 'parameters': ['social_curiosity/hate_2']}],
+              "right": [{'action': 'run_behavior', 'parameters': ['social_curiosity/hate_2']}]},
+
+       14: {
+              "left": [{'action': 'look_down'}],
+              "center": [{'action': 'look_down'}],
+              "right": [{'action': 'look_down'}]}}
+
+
+def find_key(data):
+    for key in behaviors_dict.keys():
+        if json.load(data) in behaviors_dict[key]['left']:
+            print data, key
+            return key
+
+        elif json.load(data) in behaviors_dict[key]['right']:
+            print data, key
+            return key
+
+        elif json.load(data) in behaviors_dict[key]['center']:
+            print data, key
+            return key
+
+
+
 # get a list of all the relevant bag files
 mypath = '/home/matan/Desktop/social_curiosity_data/'
 files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and '.bag' in f]
@@ -111,6 +205,9 @@ for f in files:
                     if 'secondary' in msg.data:
                         secondary_data= msg.data.split(":")
                         secondary_robot=int(secondary_data[1][0])
+                        behavior=":".join(secondary_data[2:-2])
+                        key= find_key(behavior)
+
                         data[subject_id][section_id][turn]['secondary_robots_data'][secondary_robot]={'behavior': ":".join(secondary_data[2:-2]),'relationship':secondary_data[-1]}
                         collect_secondary_robots[secondary_robot]=True
 
