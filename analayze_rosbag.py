@@ -86,16 +86,13 @@ behaviors_dict = {
 
 def find_key(data):
     for key in behaviors_dict.keys():
-        if json.load(data) in behaviors_dict[key]['left']:
-            print data, key
+        if json.loads(data) in behaviors_dict[key]['left']:
             return key
 
-        elif json.load(data) in behaviors_dict[key]['right']:
-            print data, key
+        elif json.loads(data) in behaviors_dict[key]['right']:
             return key
 
-        elif json.load(data) in behaviors_dict[key]['center']:
-            print data, key
+        elif json.loads(data) in behaviors_dict[key]['center']:
             return key
 
 
@@ -208,7 +205,7 @@ for f in files:
                         behavior=":".join(secondary_data[2:-2])
                         key= find_key(behavior)
 
-                        data[subject_id][section_id][turn]['secondary_robots_data'][secondary_robot]={'behavior': ":".join(secondary_data[2:-2]),'relationship':secondary_data[-1]}
+                        data[subject_id][section_id][turn]['secondary_robots_data'][secondary_robot]={'behavior': key,'relationship':secondary_data[-1]}
                         collect_secondary_robots[secondary_robot]=True
 
                 #tracker info:
@@ -255,7 +252,7 @@ for f in files:
             print('error - subject_id: ',subject_id)
             data.pop(subject_id)
 
-
+print data
 
 #save data
 time_now = datetime.datetime.now().strftime("%d-%m-%Y_%H:%M")
