@@ -95,6 +95,7 @@ def find_key(data):
         elif json.loads(data) in behaviors_dict[key]['center']:
             return key
 
+bad_subject=[]
 
 
 # get a list of all the relevant bag files
@@ -251,9 +252,10 @@ for f in files:
         except:
             print('error - subject_id: ',subject_id)
             data.pop(subject_id)
+            bad_subject.append(subject_id)
 
 print data
-
+print "bad subject ", bad_subject
 #save data
 time_now = datetime.datetime.now().strftime("%d-%m-%Y_%H:%M")
 
