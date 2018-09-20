@@ -17,7 +17,7 @@ num_discrete = beh_rel_prob.shape[1]
 num_behaviors = beh_rel_prob.shape[0]
 
 # real_matrix
-def bin_matrix(self, _matrix):
+def bin_matrix(_matrix):
     number_of_bins = 9
     bins = [i * (1.0 / number_of_bins) for i in xrange(number_of_bins + 1)]
     labels = [(bins[i] + bins[i + 1]) / 2.0 for i in xrange(number_of_bins)]
@@ -61,7 +61,8 @@ def matrix_from_prob(prob_i_j_):
 
     for i in range(attitude_matrix_.shape[0]):
         for j in range(attitude_matrix_.shape[1]):
-            attitude_matrix_[i, j] = np.sum(np.multiply(np.arange(1, num_discrete + 1) / (num_discrete+1.0), prob_i_j_[i,j,:]))
+            attitude_matrix_[i,j] = (np.argmax(prob_i_j_[i,j,:]) + 1.0) / (num_discrete+1.0)
+            # attitude_matrix_[i, j] = np.sum(np.multiply(np.arange(1, num_discrete + 1) / (num_discrete+1.0), prob_i_j_[i,j,:]))
     return attitude_matrix_
 
 
@@ -211,11 +212,12 @@ for subject_id, a in x.items():
         b['measures']['b_global'] = np.mean(error - global_error)
         b['measures']['b_local'] = np.mean(error - local_error)
         b['measures']['b_sequence'] = np.mean(error - sequence_error)
-        # plt.plot(error, 'b')
-        # plt.plot(local_error, 'k')
-        # plt.plot(global_error, 'r')
-        # plt.plot(sequence_error, 'c')
-        # plt.show()
+        plt.plot(error, 'b')
+        plt.plot(local_error, 'k')
+        plt.plot(global_error, 'r')
+        plt.plot(sequence_error, 'c')
+        plt.legend(['error', 'local', 'global', 'sequence'])
+        plt.show()
 
 
 # research questions:
