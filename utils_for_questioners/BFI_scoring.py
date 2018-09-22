@@ -59,8 +59,7 @@ def BFI_scoring(BFI_data):
 
             elif question in Openness:
                 Openness_score.append(question_score)
-        if index==67:
-            pass
+
         score_dict[index]['BFI_total_score']=np.nanmean(total_score)
         score_dict[index]['Extraversion'] = np.nanmean(Extraversion_score)
         score_dict[index]['Agreeableness'] = np.nanmean(Agreeableness_score)

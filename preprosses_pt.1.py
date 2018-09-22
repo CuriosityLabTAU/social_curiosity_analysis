@@ -5,6 +5,7 @@ import sys
 sys.path.append("utils_for_questioners")
 from AQ_scoring import AQ_scoring
 from BFI_scoring import BFI_scoring
+from NARS_scoring import NARS_scoring
 
 
 pt_1_data=pd.read_csv('data/qualtrics/pt.1/Pt.1_September+17%2C+2018_02.01.csv')
@@ -91,26 +92,32 @@ for col in list(NARS_data):
 NARS_data.set_index('pt1uniqueID',inplace=True)
 
 #scoring:
-# NARS_score=NARS_score._scoring(NARS_data)
+NARS_score=NARS_scoring(NARS_data)
 
 #personal_info:
-# personal_info_data=pt_1_data[['pt1uniqueID','concent','age', 'Q20', 'city', 'email', 'psychometric', 'grades avg.','Q24']]
-#
-# #validation
-# personal_info_data=personal_info_data[personal_info_data.concent=='1']
-#
-# personal_info_data.columns = ['pt1uniqueID']+['concent','age', 'gender', 'city', 'email', 'pet', 'avg_grades','faculty']
+personal_info_data=pt_1_data[['pt1uniqueID','concent','age', 'Q20', 'city', 'email', 'psychometric', 'grades avg.','Q24']]
 
-# for col in list ['pt1uniqueID','concent','age', 'gender','pet', 'avg_grades']:
-#        personal_info_data[col] = personal_info_data[col].astype(float)
+#validation
+personal_info_data=personal_info_data[personal_info_data.concent=='1']
+
+personal_info_data.columns = ['pt1uniqueID']+['concent','age', 'gender', 'city', 'email', 'pet', 'avg_grades','faculty']
 
 
+for col in  ['pt1uniqueID','concent','age', 'gender','pet', 'avg_grades']:
+       personal_info_data[col] = personal_info_data[col].astype(float,errors='ignore')
+       personal_info_data[col].replace(str, np.nan, regex=True)
 
-# print personal_info_data
+personal_info_data.set_index('pt1uniqueID',inplace=True)
+personal_info_data.to_csv('data/data_for_matan_and_noga/personal_info_data.csv')
+
+
+
+#all pt1 concat
+all_pt1_matan = pd.concat([BFI_score,AQ_score,NARS_score,personal_info_data], axis=1)
+all_pt1_matan.to_csv('data/qualtrics/pt.1/processed_pt1.csv')
 
 
 # save all pt_1 scored data:
-
 
 def save_data_to_csv_for_matan_and_noga(pt_1_data):
        # save data as csv for matan and noga:
