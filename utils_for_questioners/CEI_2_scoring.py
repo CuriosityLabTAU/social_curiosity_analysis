@@ -9,21 +9,18 @@ def CEI_2_scoring(CEI_2_data):
     score_dict={}
 
     #parametres:
-    reverse_score_list=[3,5,6]
+    reverse_score_list=[]
 
-    Negative_Attitude_toward_Situations_of_Interaction_with_Robots =[4,7,8,9,10,12]
-    Negative_Attitude_toward_Social_Influence_of_Robots= [1,2,11,13,14]
-    Negative_Attitude_toward_Elmotions_in_Interaction_with_Robots= [3,5,6]
+    stretching =[1,3,5,7,9]
+    embracing= [2,4,6,8,10]
 
     #go over every subject:
     for index, row in CEI_2_data.iterrows():
 
         score_dict[index]={}
         total_score=[]
-        Negative_Attitude_toward_Situations_of_Interaction_with_Robots_score = []
-        Negative_Attitude_toward_Social_Influence_of_Robots_score = []
-        Negative_Attitude_toward_Elmotions_in_Interaction_with_Robots_score = []
-
+        stretching_score = []
+        embracing_score = []
 
 
         #go over every question:
@@ -41,23 +38,19 @@ def CEI_2_scoring(CEI_2_data):
 
 
             #Sub scores:
-            if question in Negative_Attitude_toward_Situations_of_Interaction_with_Robots:
-                Negative_Attitude_toward_Situations_of_Interaction_with_Robots_score.append(question_score)
+            if question in stretching:
+                stretching_score.append(question_score)
 
-            elif question in Negative_Attitude_toward_Social_Influence_of_Robots:
-                Negative_Attitude_toward_Social_Influence_of_Robots_score.append(question_score)
-
-            elif question in Negative_Attitude_toward_Elmotions_in_Interaction_with_Robots:
-                Negative_Attitude_toward_Elmotions_in_Interaction_with_Robots_score.append(question_score)
+            elif question in embracing:
+                embracing_score.append(question_score)
 
         score_dict[index]['CEI_2_total_score']=np.nanmean(total_score)
-        score_dict[index]['Negative_Attitude_toward_Situations_of_Interaction_with_Robots'] = np.nanmean(Negative_Attitude_toward_Situations_of_Interaction_with_Robots_score)
-        score_dict[index]['Negative_Attitude_toward_Social_Influence_of_Robots'] = np.nanmean(Negative_Attitude_toward_Social_Influence_of_Robots_score)
-        score_dict[index]['Negative_Attitude_toward_Elmotions_in_Interaction_with_Robots'] = np.nanmean(Negative_Attitude_toward_Elmotions_in_Interaction_with_Robots_score)
+        score_dict[index]['stretching'] = np.nanmean(stretching_score)
+        score_dict[index]['embracing'] = np.nanmean(embracing_score)
 
     # crate df:
     CEI_2_score_df= pd.DataFrame.from_dict(score_dict, orient='index')
-    CEI_2_score_df=CEI_2_score_df[['Negative_Attitude_toward_Situations_of_Interaction_with_Robots','Negative_Attitude_toward_Social_Influence_of_Robots','Negative_Attitude_toward_Elmotions_in_Interaction_with_Robots','NARS_total_score']]
+    CEI_2_score_df=CEI_2_score_df[['stretching','embracing','CEI_2_total_score']]
 
 
     # ##export to excel

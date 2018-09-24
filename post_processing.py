@@ -7,12 +7,12 @@ import copy
 #
 
 # load data
-data_path = 'data/'
-filename = 'robot_interaction_data/raw_data_20-09-2018_19:38'
+data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
 x = pickle.load(open(data_path+filename, 'rb'))
 
 # load behavior_relationship probability
-beh_rel_prob = pd.read_csv(data_path + 'amt_probs/probs_from_AMT.csv').values
+beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values
 num_discrete = beh_rel_prob.shape[1]
 num_behaviors = beh_rel_prob.shape[0]
 
@@ -77,9 +77,8 @@ def task_from_matrix(attitude_matrix_):
 
 
 # subject_id --> {section_id[1-5]} --> turn [4, 8, 8, 8 , 8] -->
-dict_for_measure_df={}
+
 for subject_id, a in x.items():
-    dict_for_measure_df[subject_id]={}
     for section_id, b in a.items():
         # for each section, a new matrix
 
@@ -213,26 +212,13 @@ for subject_id, a in x.items():
         b['measures']['b_global'] = np.mean(error - global_error)
         b['measures']['b_local'] = np.mean(error - local_error)
         b['measures']['b_sequence'] = np.mean(error - sequence_error)
+        plt.plot(error, 'b')
+        plt.plot(local_error, 'k')
+        plt.plot(global_error, 'r')
+        plt.plot(sequence_error, 'c')
+        plt.legend(['error', 'local', 'global', 'sequence'])
+        plt.show()
 
-        dict_for_measure_df[subject_id]['delta_'+str(section_id)]         = task_performance(tasks, 'right_answer')
-        dict_for_measure_df[subject_id]['delta_tilde_'+str(section_id)]   = task_performance(tasks, 'learned_matrix')
-        dict_for_measure_df[subject_id]['b_global_'+str(section_id)]      =  np.mean(error - global_error)
-        dict_for_measure_df[subject_id]['b_local_'+str(section_id)]        =  np.mean(error - local_error)
-        dict_for_measure_df[subject_id]['b_sequence_'+str(section_id)]     =  np.mean(error - sequence_error)
-
-
-
-
-
-        # plt.plot(error, 'b')
-        # plt.plot(local_error, 'k')
-        # plt.plot(global_error, 'r')
-        # plt.plot(sequence_error, 'c')
-        # plt.legend(['error', 'local', 'global', 'sequence'])
-        # plt.show()
-
-all_measure_df=pd.DataFrame.from_dict(dict_for_measure_df, orient='index')
-print all_measure_df
 
 # research questions:
 
