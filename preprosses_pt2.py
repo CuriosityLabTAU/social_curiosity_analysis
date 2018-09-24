@@ -7,6 +7,7 @@ from CEI_2_scoring import CEI_2_scoring
 from Five_Dimensional_Curiosity_scoring import Five_Dimensional_Curiosity_scoring
 from SCS_scoring import SCS_scoring
 from State_trait_scale_scoring import State_trait_scale_scoring
+from Godspeed_scoring import Godspeed_scoring
 
 pt_2_data=pd.read_csv('data/qualtrics/pt.2/Pt.2_September+22%2C+2018_14.23.csv')
 all_c=['StartDate', 'EndDate', 'Status', 'IPAddress', 'Progress', 'Duration (in seconds)', 'Finished', 'RecordedDate', 'ResponseId',
@@ -61,7 +62,8 @@ for col in list(Godspeed_data):
 Godspeed_data.set_index('unique_ID',inplace=True)
 
 # scoring:
-# Godspeed_score=Godspeed_scoring(Godspeed_data)
+Godspeed_score=Godspeed_scoring(Godspeed_data)
+print Godspeed_score
 
 ##State_trait_scale_1 data
 State_trait_scale_data=pt_2_data[['unique ID','State-trait scale 1_1', 'State-trait scale 1_2', 'State-trait scale 1_3', 'State-trait scale 1_4',
@@ -89,10 +91,9 @@ for col in list(State_trait_scale_data):
 
 State_trait_scale_data.set_index('unique_ID',inplace=True)
 
-
 # scoring:
 State_trait_scale_score=State_trait_scale_scoring(State_trait_scale_data)
-print State_trait_scale_score
+
 
 ##scs data
 scs_data=pt_2_data[['unique ID','SCS_1', 'SCS_2', 'SCS_3', 'SCS_4', 'SCS_5', 'SCS_6', 'SCS_7', 'SCS_8', 'SCS_9', 'SCS_10', 'SCS_11',
