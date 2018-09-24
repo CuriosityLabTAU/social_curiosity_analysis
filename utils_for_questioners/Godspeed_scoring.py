@@ -61,7 +61,7 @@ def Godspeed_scoring(Godspeed_data):
 
         score_dict[index]['Anthropomorphism'] = np.nanmean(Anthropomorphism_score)
         score_dict[index]['Animacy'] = np.nanmean(Animacy_score)
-        score_dict[index]['Likeability'] = np.nanmean(Likeability)
+        score_dict[index]['Likeability'] = np.nanmean(Likeability_score)
         score_dict[index]['perceived_Intelligence'] = np.nanmean(perceived_Intelligence_score)
         score_dict[index]['Safety_of_Robots'] = np.nanmean(Safety_of_Robots_score)
 
