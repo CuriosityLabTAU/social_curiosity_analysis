@@ -9,7 +9,8 @@ from SCS_scoring import SCS_scoring
 from State_trait_scale_scoring import State_trait_scale_scoring
 from Godspeed_scoring import Godspeed_scoring
 
-pt_2_data=pd.read_csv('data/qualtrics/pt.2/Pt.2_September+22%2C+2018_14.23.csv')
+pt_2_data=pd.read_csv('data/qualtrics/pt.2/Pt.2_September+24%2C+2018_11.50.csv')
+
 all_c=['StartDate', 'EndDate', 'Status', 'IPAddress', 'Progress', 'Duration (in seconds)', 'Finished', 'RecordedDate', 'ResponseId',
        'RecipientLastName', 'RecipientFirstName', 'RecipientEmail', 'ExternalReference', 'LocationLatitude', 'LocationLongitude',
        'DistributionChannel', 'UserLanguage', 'unique ID', 'Godspeed_1', 'Godspeed_2', 'Godspeed_3', 'Godspeed_4', 'Godspeed_5',
@@ -47,6 +48,7 @@ pt_2_data=pt_2_data.drop([0,1])
 pt_2_data['unique ID'] = pt_2_data['unique ID'].replace(['5237101'], '1000')
 pt_2_data['unique ID'] = pt_2_data['unique ID'].replace(['2768968'], '1001')
 
+print list(pt_2_data)
 
 ##Godspeed data
 Godspeed_data=pt_2_data[['unique ID','Godspeed_1', 'Godspeed_2', 'Godspeed_3', 'Godspeed_4', 'Godspeed_5',
@@ -63,7 +65,6 @@ Godspeed_data.set_index('unique_ID',inplace=True)
 
 # scoring:
 Godspeed_score=Godspeed_scoring(Godspeed_data)
-print Godspeed_score
 
 ##State_trait_scale_1 data
 State_trait_scale_data=pt_2_data[['unique ID','State-trait scale 1_1', 'State-trait scale 1_2', 'State-trait scale 1_3', 'State-trait scale 1_4',
@@ -141,5 +142,5 @@ CEI_2_data.set_index('unique_ID',inplace=True)
 CEI_2_score=CEI_2_scoring(CEI_2_data)
 
 #all pt1 concat
-# all_pt2_matan = pd.concat([Godspeed_score ,State_trait_scale_score,scs_score, Five_Dimensional_Curiosity_score ,CEI_2_score], axis=1)
-# all_pt2_matan.to_csv('data/qualtrics/pt.2/processed_pt2.csv')
+all_pt2_matan = pd.concat([Godspeed_score ,State_trait_scale_score,scs_score, Five_Dimensional_Curiosity_score ,CEI_2_score], axis=1)
+all_pt2_matan.to_csv('data/qualtrics/pt.2/processed_pt2.csv')

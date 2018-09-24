@@ -8,7 +8,7 @@ from BFI_scoring import BFI_scoring
 from NARS_scoring import NARS_scoring
 
 
-pt_1_data=pd.read_csv('data/qualtrics/pt.1/Pt.1_September+17%2C+2018_02.01.csv')
+pt_1_data=pd.read_csv('data/qualtrics/pt.1/Pt.1_September+24%2C+2018_10.44.csv')
 
 all_c=['StartDate', 'EndDate', 'Status', 'IPAddress', 'Progress', 'Duration (in seconds)',
        'Finished', 'RecordedDate', 'ResponseId', 'RecipientLastName', 'RecipientFirstName', 'RecipientEmail',
@@ -79,7 +79,6 @@ AQ_data.set_index('pt1uniqueID',inplace=True)
 #scoring:
 AQ_score=AQ_scoring(AQ_data)
 
-
 ## NARS data:
 NARS_data=pt_1_data[['pt1uniqueID','NARS_1', 'NARS_2', 'NARS_3', 'NARS_4', 'NARS_5', 'NARS_6', 'NARS_7', 'NARS_8', 'NARS_9', 'NARS_10', 'NARS_11',
        'NARS_12', 'NARS_13', 'NARS_14']]
@@ -94,7 +93,7 @@ NARS_data.set_index('pt1uniqueID',inplace=True)
 #scoring:
 NARS_score=NARS_scoring(NARS_data)
 
-#personal_info:
+##personal_info:
 personal_info_data=pt_1_data[['pt1uniqueID','concent','age', 'Q20', 'city', 'email', 'psychometric', 'grades avg.','Q24']]
 
 #validation
@@ -105,12 +104,11 @@ personal_info_data.columns = ['pt1uniqueID']+['concent','age', 'gender', 'city',
 
 for col in  ['pt1uniqueID','concent','age', 'gender','pet', 'avg_grades']:
        personal_info_data[col] = personal_info_data[col].astype(float,errors='ignore')
-       personal_info_data[col].replace(str, np.nan, regex=True)
+       personal_info_data[col]=personal_info_data[col].replace('[^0-9\/]+', np.nan, regex=True)
 
 personal_info_data.set_index('pt1uniqueID',inplace=True)
-personal_info_data.to_csv('data/data_for_matan_and_noga/personal_info_data.csv')
 
-
+# print personal_info_data
 
 #all pt1 concat
 all_pt1_matan = pd.concat([BFI_score,AQ_score,NARS_score,personal_info_data], axis=1)

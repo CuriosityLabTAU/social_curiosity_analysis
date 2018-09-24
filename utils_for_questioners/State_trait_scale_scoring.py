@@ -60,7 +60,6 @@ def State_trait_scale_scoring(State_trait_data):
                 S_Curiosity_score.append(question_score)
 
             elif question in S_Anger:
-                print question_score
                 S_Anger_score.append(question_score)
 
             elif question in S_Depression:
