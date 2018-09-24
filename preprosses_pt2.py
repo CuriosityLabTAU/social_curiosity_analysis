@@ -89,6 +89,7 @@ for col in list(State_trait_scale_data):
 
 State_trait_scale_data.set_index('unique_ID',inplace=True)
 
+
 # scoring:
 State_trait_scale_score=State_trait_scale_scoring(State_trait_scale_data)
 print State_trait_scale_score
