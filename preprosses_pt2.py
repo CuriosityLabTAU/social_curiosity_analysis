@@ -5,7 +5,7 @@ import sys
 sys.path.append("utils_for_questioners")
 from CEI_2_scoring import CEI_2_scoring
 from Five_Dimensional_Curiosity_scoring import Five_Dimensional_Curiosity_scoring
-
+from SCS_scoring import SCS_scoring
 
 
 pt_2_data=pd.read_csv('data/qualtrics/pt.2/Pt.2_September+22%2C+2018_14.23.csv')
@@ -121,8 +121,9 @@ for col in list(scs_data):
 scs_data.set_index('unique_ID',inplace=True)
 
 # scoring:
-# scs_score=scs_scoring(scs_data)
+scs_score=SCS_scoring(scs_data)
 
+print scs_score
 
 
 ##Five_Dimensional_Curiosity data
@@ -140,8 +141,6 @@ Five_Dimensional_Curiosity_data.set_index('unique_ID',inplace=True)
 # scoring:
 Five_Dimensional_Curiosity_score=Five_Dimensional_Curiosity_scoring(Five_Dimensional_Curiosity_data)
 
-print Five_Dimensional_Curiosity_score
-
 
 ##CEI-2 data
 CEI_2_data=pt_2_data[['unique ID','CEI-2_1', 'CEI-2_3', 'CEI-2_4', 'CEI-2_5', 'CEI-2_6', 'CEI-2_7', 'CEI-2_8', 'CEI-2_9', 'CEI-2_10', 'CEI-2_54']]
@@ -157,5 +156,5 @@ CEI_2_data.set_index('unique_ID',inplace=True)
 CEI_2_score=CEI_2_scoring(CEI_2_data)
 
 #all pt1 concat
-# all_pt2_matan = pd.concat([Godspeed_score      ,State_trait_scale_1_score,State_trait_scale_2_score,scs_score,_5_dc_score,CEI_2_score], axis=1)
+# all_pt2_matan = pd.concat([Godspeed_score ,State_trait_scale_1_score,State_trait_scale_2_score,scs_score,_5_dc_score,CEI_2_score], axis=1)
 # all_pt2_matan.to_csv('data/qualtrics/pt.2/processed_pt2.csv')
