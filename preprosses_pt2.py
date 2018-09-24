@@ -41,6 +41,10 @@ all_c=['StartDate', 'EndDate', 'Status', 'IPAddress', 'Progress', 'Duration (in 
 # remove_ferst_two_lines:
 pt_2_data=pt_2_data.drop([0,1])
 
+#change two subfects ID:
+pt_2_data['unique ID'] = pt_2_data['unique ID'].replace(['5237101'], '1000')
+pt_2_data['unique ID'] = pt_2_data['unique ID'].replace(['2768968'], '1001')
+
 
 ##Godspeed data
 Godspeed_data=pt_2_data[['unique ID','Godspeed_1', 'Godspeed_2', 'Godspeed_3', 'Godspeed_4', 'Godspeed_5',
@@ -148,8 +152,7 @@ for col in list(CEI_2_data):
 CEI_2_data.set_index('unique_ID',inplace=True)
 
 # scoring:
-# CEI_2_score=CEI_2_scoring(CEI_2_data)
-
+CEI_2_score=CEI_2_scoring(CEI_2_data)
 
 #all pt1 concat
 # all_pt2_matan = pd.concat([Godspeed_score      ,State_trait_scale_1_score,State_trait_scale_2_score,scs_score,_5_dc_score,CEI_2_score], axis=1)

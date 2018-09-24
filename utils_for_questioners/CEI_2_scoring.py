@@ -24,7 +24,7 @@ def CEI_2_scoring(CEI_2_data):
 
 
         #go over every question:
-        for question in range(1,15):
+        for question in range(1,11):
             #calculate the score:
             #reverse scores:
             if question in reverse_score_list:
