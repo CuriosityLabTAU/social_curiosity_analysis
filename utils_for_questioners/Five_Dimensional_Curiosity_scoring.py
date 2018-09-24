@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 
-def Five_Dimensional_Curiosity_scoring_scoring(Five_Dimensional_Curiosity_data):
+def Five_Dimensional_Curiosity_scoring(Five_Dimensional_Curiosity_data):
     score_dict={}
 
     #parametres:
@@ -58,7 +58,7 @@ def Five_Dimensional_Curiosity_scoring_scoring(Five_Dimensional_Curiosity_data):
         score_dict[index]['5DC_Deprivation_Sensitivity'] = np.nanmean(Deprivation_Sensitivity_score)
         score_dict[index]['5DC_Stress_Tolerance'] = np.nanmean(Stress_Tolerance_score)
         score_dict[index]['5DC_Social_Curiosity'] = np.nanmean(Social_Curiosity_score)
-        score_dict[index][''] = np.nanmean(Thrill_Seeking_score)
+        score_dict[index]['5DC_Thrill_Seeking'] = np.nanmean(Thrill_Seeking_score)
 
     # crate df:
     Five_Dimensional_Curiosity_scoring_scoring_df= pd.DataFrame.from_dict(score_dict, orient='index')
