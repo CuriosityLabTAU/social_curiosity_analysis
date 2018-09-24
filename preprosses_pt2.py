@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("utils_for_questioners")
 from CEI_2_scoring import CEI_2_scoring
+from Five_Dimensional_Curiosity_scoring import Five_Dimensional_Curiosity_scoring
 
 
 
@@ -124,21 +125,22 @@ scs_data.set_index('unique_ID',inplace=True)
 
 
 
-##5DC data
-_5_dc_data=pt_2_data[['unique ID','5DC_1', '5DC_2', '5DC_3', '5DC_4', '5DC_5', '5DC_6', '5DC_7', '5DC_8', '5DC_9', '5DC_10', '5DC_11',
+##Five_Dimensional_Curiosity data
+Five_Dimensional_Curiosity_data=pt_2_data[['unique ID','5DC_1', '5DC_2', '5DC_3', '5DC_4', '5DC_5', '5DC_6', '5DC_7', '5DC_8', '5DC_9', '5DC_10', '5DC_11',
        '5DC_12', '5DC_13', '5DC_14', '5DC_15', '5DC_16', '5DC_17', '5DC_18', '5DC_19', '5DC_20', '5DC_21', '5DC_22', '5DC_23', '5DC_24','5DC_25']]
 
-_5_dc_data.columns = ['unique_ID']+[i for i in xrange(1,26)]
+Five_Dimensional_Curiosity_data.columns = ['unique_ID']+[i for i in xrange(1,26)]
 
-for col in list(_5_dc_data):
-       _5_dc_data[col] = _5_dc_data[col].astype(float)
+for col in list(Five_Dimensional_Curiosity_data):
+       Five_Dimensional_Curiosity_data[col] = Five_Dimensional_Curiosity_data[col].astype(float)
 
-_5_dc_data.set_index('unique_ID',inplace=True)
+Five_Dimensional_Curiosity_data.set_index('unique_ID',inplace=True)
 
 
 # scoring:
-# _5_dc_score=_5_dc_scoring(_5_dc_data)
+Five_Dimensional_Curiosity_score=Five_Dimensional_Curiosity_scoring(Five_Dimensional_Curiosity_data)
 
+print Five_Dimensional_Curiosity_score
 
 
 ##CEI-2 data
