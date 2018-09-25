@@ -79,9 +79,10 @@ def factor_scores(all_measures_, fa_, n_factors=4):
 
 
 def calc_correlation(all_measures_, factor_names):
-    interesting_measures = ['S_Curiosity', 'T_Curiosity', 'SCS_total_score', 'General_Social_Curiosity', 'Covert_Social_Curiosity',
-                            '_5DC_Social_Curiosity',
-                            'CEI_2_total_score', 'AQ_total_score', 'Openness', 'Neuroticism', 'pet', 'avg_grades']
+    interesting_measures = [#'S_Curiosity', 'T_Curiosity', 'SCS_total_score', 'General_Social_Curiosity', 'Covert_Social_Curiosity',
+                            '_5DC_Social_Curiosity', '_5DC_Joyous_Exploration', '_5DC_Deprivation_Sensitivity', '_5DC_Stress_Tolerance', '_5DC_Thrill_Seeking'
+#                            'CEI_2_total_score', 'AQ_total_score', 'Openness', 'Neuroticism', 'pet', 'avg_grades'
+    ]
 
     ylabel_map = {
         'psychometric_grade': 'PET',
@@ -180,7 +181,6 @@ factor_names.append('age')
 factor_names.append('gender')
 factor_names.append('NARS_total_score')
 factor_names.append('Anthropomorphism')
-factor_names.append('Likeability')
 
 
 all_data = pd.concat([all_data, factor_df], axis=1)
