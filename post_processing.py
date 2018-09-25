@@ -8,7 +8,7 @@ import copy
 
 # load data
 data_path = 'data/'
-filename = 'robot_interaction_data/raw_data_20-09-2018_19:38'
+filename = 'robot_interaction_data/raw_data_25-09-2018_09:30'
 x = pickle.load(open(data_path+filename, 'rb'))
 
 # load behavior_relationship probability
