@@ -11,11 +11,15 @@ import copy
 # data_path = 'data/'
 # filename = 'robot_interaction_data/raw_data_25-09-2018_09:30'
 # beh_rel_prob = pd.read_csv(data_path + 'amt_probs/probs_from_AMT.csv').values
+# output_path = 'data/external_and_internal_data/all_internal_data.csv'
 # GOREN:
 data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-filename = 'all_data/raw_data_25-09-2018_09_30'
-# filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
-beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values
+# filename = 'all_data/raw_data_25-09-2018_09_30'
+filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
+output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
+
+
+beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
 
 x = pickle.load(open(data_path+filename, 'rb'))
 
@@ -69,7 +73,10 @@ def matrix_from_prob(prob_i_j_):
 
     for i in range(attitude_matrix_.shape[0]):
         for j in range(attitude_matrix_.shape[1]):
-            attitude_matrix_[i,j] = (np.argmax(prob_i_j_[i,j,:]) + 1.0) / (num_discrete+1.0)
+            is_max = np.where(prob_i_j_[i,j,:] == np.max(prob_i_j_[i,j,:]))[0]
+            median_max = is_max[int(len(is_max) / 2)]
+            attitude_matrix_[i, j] = (median_max + 1.0) / (num_discrete + 1.0)
+            # attitude_matrix_[i,j] = (np.argmax(prob_i_j_[i,j,:]) + 1.0) / (num_discrete+1.0)
             # attitude_matrix_[i, j] = np.sum(np.multiply(np.arange(1, num_discrete + 1) / (num_discrete+1.0), prob_i_j_[i,j,:]))
     return attitude_matrix_
 
@@ -117,7 +124,6 @@ for subject_id, a in x.items():
                             the_sequence.append(i_robot)
 
         print(subject_id, section_id, len(the_sequence))
-        print(the_sequence)
 
         for turn, c in b.items():
             # for each turn, a different agent does something
@@ -147,7 +153,7 @@ for subject_id, a in x.items():
                             prob_i_j = update_bayes(prob_i_j, i_robot, j_robot, behavior)
                             attitude_matrix = matrix_from_prob(prob_i_j)
 
-                            error_t = np.mean(np.power(attitude_matrix[:] - real_matrix[:], 2.0))
+                            error_t = np.mean(np.power(attitude_matrix[:] - real_matrix[section_id][:], 2.0))
                             error.append(error_t)
 
                             # for local optimal behavior
@@ -161,7 +167,7 @@ for subject_id, a in x.items():
                                     what_if_local_attitude_matrix = matrix_from_prob(what_if_local_prob[k_robot])
 
                                     what_if_local_error[k_robot] = np.mean(np.power(
-                                        what_if_local_attitude_matrix[:] - real_matrix[:], 2.0))
+                                        what_if_local_attitude_matrix[:] - real_matrix[section_id][:], 2.0))
                             what_if_local_min_error = np.min(what_if_local_error)
                             local_error.append(what_if_local_min_error)
 
@@ -180,7 +186,7 @@ for subject_id, a in x.items():
                                     what_if_global_attitude_matrix = matrix_from_prob(what_if_global_prob[k_robot])
 
                                     what_if_global_error[k_robot] = np.mean(np.power(
-                                        what_if_global_attitude_matrix[:] - real_matrix[:], 2.0))
+                                        what_if_global_attitude_matrix[:] - real_matrix[section_id][:], 2.0))
                             optimal_behavior = np.argmin(what_if_global_error)
                             what_if_global_min_error = np.min(what_if_global_error)
                             global_error.append(what_if_global_min_error)
@@ -201,10 +207,13 @@ for subject_id, a in x.items():
                                     what_if_sequence_attitude_matrix = matrix_from_prob(what_if_sequence_prob[k_sequence])
 
                                     what_if_sequence_error[k_sequence] = np.mean(np.power(
-                                        what_if_sequence_attitude_matrix[:] - real_matrix[:], 2.0))
+                                        what_if_sequence_attitude_matrix[:] - real_matrix[section_id][:], 2.0))
                             sequence_behavior = np.argmin(what_if_sequence_error)
                             what_if_sequence_min_error = np.min(what_if_sequence_error)
-                            sequence_error.append(what_if_sequence_min_error)
+                            if what_if_sequence_min_error != 1.0:
+                                sequence_error.append(what_if_sequence_min_error)
+                            else:
+                                sequence_error.append(sequence_error[-1])
 
                             sequence_prob_i_j = copy.deepcopy(what_if_sequence_prob[sequence_behavior])
                             del the_sequence[sequence_behavior]
@@ -228,16 +237,16 @@ for subject_id, a in x.items():
         dict_for_measure_df[subject_id]['b_local_'+str(section_id)]        =  np.mean(error - local_error)
         dict_for_measure_df[subject_id]['b_sequence_'+str(section_id)]     =  np.mean(error - sequence_error)
 
-        if subject_id == 1002.0:
-            plt.plot(error, 'b')
-            plt.plot(local_error, 'k')
-            plt.plot(global_error, 'r')
-            plt.plot(sequence_error, 'c')
-            plt.legend(['error', 'local', 'global', 'sequence'])
-            plt.show()
+        # if subject_id == 1002.0:
+        #     plt.plot(error, 'b')
+        #     plt.plot(local_error, 'k')
+        #     plt.plot(global_error, 'r')
+        #     plt.plot(sequence_error, 'c')
+        #     plt.legend(['error', 'local', 'global', 'sequence'])
+        #     plt.show()
 
 all_measure_df=pd.DataFrame.from_dict(dict_for_measure_df, orient='index')
-all_measure_df.to_csv('data/external_and_internal_data/all_internal_data.csv')
+all_measure_df.to_csv(output_path)
 
 # research questions:
 
