@@ -249,7 +249,7 @@ all_measure_df=pd.DataFrame.from_dict(dict_for_measure_df, orient='index')
 all_measure_df.reset_index(inplace=True)
 all_measure_df=all_measure_df.rename(columns = {'index':'Subject_ID'})
 
-all_measure_df.to_csv(output_path)
+all_measure_df.to_csv(output_path,index=False)
 
 # research questions:
 
