@@ -8,18 +8,17 @@ import copy
 
 # load data
 # MATAN:
-# data_path = 'data/'
-# filename = 'robot_interaction_data/raw_data_25-09-2018_09:30'
-# beh_rel_prob = pd.read_csv(data_path + 'amt_probs/probs_from_AMT.csv').values
-# output_path = 'data/external_and_internal_data/all_internal_data.csv'
+data_path = 'data/'
+filename = 'robot_interaction_data/raw_data_26-09-2018_16:43'
+beh_rel_prob = pd.read_csv('data/amt_probs/probs_from_AMT.csv').values
+output_path = 'data/external_and_internal_data/all_internal_data.csv'
+
 # GOREN:
-data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-# filename = 'all_data/raw_data_25-09-2018_09_30'
-filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
-output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
-
-
-beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
+# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+# # filename = 'all_data/raw_data_25-09-2018_09_30'
+# filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
+# output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
+# beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
 
 x = pickle.load(open(data_path+filename, 'rb'))
 
@@ -231,6 +230,7 @@ for subject_id, a in x.items():
         b['measures']['b_global'] = np.mean(error - global_error)
         b['measures']['b_local'] = np.mean(error - local_error)
         b['measures']['b_sequence'] = np.mean(error - sequence_error)
+
         dict_for_measure_df[subject_id]['delta_'+str(section_id)]         = task_performance(tasks, 'right_answer')
         dict_for_measure_df[subject_id]['delta_tilde_'+str(section_id)]   = task_performance(tasks, 'learned_matrix')
         dict_for_measure_df[subject_id]['b_global_'+str(section_id)]      =  np.mean(error - global_error)
@@ -246,6 +246,9 @@ for subject_id, a in x.items():
         #     plt.show()
 
 all_measure_df=pd.DataFrame.from_dict(dict_for_measure_df, orient='index')
+all_measure_df.reset_index(inplace=True)
+all_measure_df=all_measure_df.rename(columns = {'index':'Subject_ID'})
+
 all_measure_df.to_csv(output_path)
 
 # research questions:

@@ -54,19 +54,19 @@ def Five_Dimensional_Curiosity_scoring(Five_Dimensional_Curiosity_data):
             elif question in Thrill_Seeking:
                 Thrill_Seeking_score.append(question_score)
 
-        score_dict[index]['5DC_Joyous_Exploration'] = np.nanmean(Joyous_Exploration_score)
-        score_dict[index]['5DC_Deprivation_Sensitivity'] = np.nanmean(Deprivation_Sensitivity_score)
-        score_dict[index]['5DC_Stress_Tolerance'] = np.nanmean(Stress_Tolerance_score)
-        score_dict[index]['5DC_Social_Curiosity'] = np.nanmean(Social_Curiosity_score)
-        score_dict[index]['5DC_Thrill_Seeking'] = np.nanmean(Thrill_Seeking_score)
+        score_dict[index]['_5DC_Joyous_Exploration'] = np.nanmean(Joyous_Exploration_score)
+        score_dict[index]['_5DC_Deprivation_Sensitivity'] = np.nanmean(Deprivation_Sensitivity_score)
+        score_dict[index]['_5DC_Stress_Tolerance'] = np.nanmean(Stress_Tolerance_score)
+        score_dict[index]['_5DC_Social_Curiosity'] = np.nanmean(Social_Curiosity_score)
+        score_dict[index]['_5DC_Thrill_Seeking'] = np.nanmean(Thrill_Seeking_score)
 
     # crate df:
     Five_Dimensional_Curiosity_scoring_scoring_df= pd.DataFrame.from_dict(score_dict, orient='index')
-    Five_Dimensional_Curiosity_scoring_scoring_df=Five_Dimensional_Curiosity_scoring_scoring_df[['5DC_Joyous_Exploration',
-                                                                                                 '5DC_Deprivation_Sensitivity',
-                                                                                                 '5DC_Stress_Tolerance',
-                                                                                                 '5DC_Social_Curiosity',
-                                                                                                 '5DC_Thrill_Seeking']]
+    Five_Dimensional_Curiosity_scoring_scoring_df=Five_Dimensional_Curiosity_scoring_scoring_df[['_5DC_Joyous_Exploration',
+                                                                                                 '_5DC_Deprivation_Sensitivity',
+                                                                                                 '_5DC_Stress_Tolerance',
+                                                                                                 '_5DC_Social_Curiosity',
+                                                                                                 '_5DC_Thrill_Seeking']]
 
 
     # ##export to excel

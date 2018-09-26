@@ -7,9 +7,15 @@ import matplotlib.gridspec as gridspec
 sns.set()
 import statsmodels.formula.api as sm
 
+# #Matan
+# external_filename = 'data/all_external_data.csv'
+# internal_filename = 'data/external_and_internal_data/all_internal_data.csv'
 
-external_filename = 'data/all_external_data.csv'
-internal_filename = 'data/all_internal_data.csv'
+
+#Goren
+data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+external_filename = data_path+'all_data/all_external_data.csv'
+internal_filename = data_path+'all_data/all_internal_data.csv'
 
 
 all_internal = pd.read_csv(open(internal_filename))
@@ -107,7 +113,21 @@ def b_over_time():
 
     plt.show()
 
-# b_over_time()
+    print 'b_local vs time '
+    result = sm.ols(formula='Time ~ Score ', data=b_local_data).fit()
+    print result.summary()
+
+    print 'b_global vs time '
+    result = sm.ols(formula='Time ~ Score ', data=b_global_data).fit()
+    print result.summary()
+
+
+    print 'b_sequence vs time '
+    result = sm.ols(formula='Time ~ Score ', data=b_sequence_data).fit()
+    print result.summary()
+
+
+b_over_time()
 
 def delta_over_time():
     f, ax = plt.subplots(1, 1)

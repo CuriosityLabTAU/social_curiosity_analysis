@@ -9,7 +9,7 @@ from SCS_scoring import SCS_scoring
 from State_trait_scale_scoring import State_trait_scale_scoring
 from Godspeed_scoring import Godspeed_scoring
 
-pt_2_data=pd.read_csv('data/qualtrics/pt.2/Pt.2_September+24%2C+2018_11.50.csv')
+pt_2_data=pd.read_csv('data/qualtrics/pt.2/Pt.2_September+26%2C+2018_07.57.csv')
 
 all_c=['StartDate', 'EndDate', 'Status', 'IPAddress', 'Progress', 'Duration (in seconds)', 'Finished', 'RecordedDate', 'ResponseId',
        'RecipientLastName', 'RecipientFirstName', 'RecipientEmail', 'ExternalReference', 'LocationLatitude', 'LocationLongitude',
