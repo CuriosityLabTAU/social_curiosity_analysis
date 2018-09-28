@@ -268,12 +268,14 @@ for subject_id, a in x.items():
         b['measures']['delta'] = task_performance(tasks, 'right_answer')
         b['measures']['delta_tilde'] = task_performance(tasks, 'learned_matrix')
 
+        b['measures']['b_error'] = error[-1]
         b['measures']['b_global'] = np.mean(error - global_error)
         b['measures']['b_local'] = np.mean(error - local_error)
         b['measures']['b_sequence'] = np.mean(error - sequence_error)
 
         dict_for_measure_df[subject_id]['delta_'+str(section_id)]         = task_performance(tasks, 'right_answer')
         dict_for_measure_df[subject_id]['delta_tilde_'+str(section_id)]   = task_performance(tasks, 'learned_matrix')
+        dict_for_measure_df[subject_id]['b_error' + str(section_id)] = error[-1]
         dict_for_measure_df[subject_id]['b_global_'+str(section_id)]      =  np.mean(error - global_error)
         dict_for_measure_df[subject_id]['b_local_'+str(section_id)]        =  np.mean(error - local_error)
         dict_for_measure_df[subject_id]['b_sequence_'+str(section_id)]     =  np.mean(error - sequence_error)
@@ -301,19 +303,21 @@ all_measure_df=all_measure_df.rename(columns = {'index':'Subject_ID'})
 all_measure_df.set_index('Subject_ID',inplace=True)
 
 
+b_error_list = ['b_error_0', 'b_error_1', 'b_error_2', 'b_error_3', 'b_error_4']
 b_local_list = ['b_local_0', 'b_local_1', 'b_local_2', 'b_local_3', 'b_local_4']
 b_global_list = ['b_global_0', 'b_global_1', 'b_global_2', 'b_global_3', 'b_global_4']
 b_sequence_list = ['b_sequence_0', 'b_sequence_1', 'b_sequence_2', 'b_sequence_3', 'b_sequence_4']
 delta_list = ['delta_0', 'delta_1', 'delta_2', 'delta_3', 'delta_4']
 delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1', 'delta_tilde_2', 'delta_tilde_3', 'delta_tilde_4']
 
+m_b_error = linear_regression_from_df(all_measure_df[b_error_list[1:]], 'm_b_error')
 m_b_local = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_local')
 b_global = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_global')
 b_sequence = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_sequence')
 delta = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_delta')
 delta_tilde = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_delta_tilde')
 
-all_measure_df = pd.concat([m_b_local, b_global, b_sequence, delta, delta_tilde,all_measure_df], axis=1)
+all_measure_df = pd.concat([m_b_error, m_b_local, b_global, b_sequence, delta, delta_tilde,all_measure_df], axis=1)
 
 all_measure_df.reset_index(inplace=True)
 
