@@ -9,7 +9,7 @@ sns.set()
 # load data
 # MATAN:
 data_path = 'data/'
-filename = 'robot_interaction_data/raw_data_26-09-2018_16:43'
+filename = 'robot_interaction_data/raw_data_28-09-2018_18:27'
 beh_rel_prob = pd.read_csv('data/amt_probs/probs_from_AMT.csv').values
 output_path = 'data/external_and_internal_data/all_internal_data.csv'
 
@@ -124,6 +124,10 @@ def task_from_matrix(attitude_matrix_):
 
 # subject_id --> {section_id[1-5]} --> turn [4, 8, 8, 8 , 8] -->
 dict_for_measure_df={}
+plt.ion()
+# fig = plt.figure(1)
+f, ax = plt.subplots(1, 1)
+
 for subject_id, a in x.items():
     dict_for_measure_df[subject_id]={}
     for section_id, b in a.items():
@@ -269,8 +273,7 @@ for subject_id, a in x.items():
         dict_for_measure_df[subject_id]['b_local_'+str(section_id)]        =  np.mean(error - local_error)
         dict_for_measure_df[subject_id]['b_sequence_'+str(section_id)]     =  np.mean(error - sequence_error)
 
-        f, ax = plt.subplots(1, 1)
-
+        plt.cla()
         a = sns.lineplot(data=error, label='error')
         b = sns.lineplot(data=local_error,    label=r"$\beta_{\rm local}$")
         c = sns.lineplot(data=global_error,   label=r"$\beta_{\rm global}$")
@@ -279,7 +282,9 @@ for subject_id, a in x.items():
         ax.set(xlabel='Time', ylabel='error',title= 'subject_id: '+str(subject_id)+" , "+'section_id: '+str(section_id))
 
         ax.legend()
-        plt.show()
+
+        f.canvas.draw()
+        plt.draw()
 
 all_measure_df=pd.DataFrame.from_dict(dict_for_measure_df, orient='index')
 all_measure_df.reset_index(inplace=True)
