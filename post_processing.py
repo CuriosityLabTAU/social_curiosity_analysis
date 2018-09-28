@@ -15,8 +15,8 @@ sns.set()
 
 # GOREN:
 data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-# filename = 'all_data/raw_data_25-09-2018_09_30'
 filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
+# filename = 'all_data/raw_data_28-09-2018_18_27'
 output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
 beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
 
@@ -84,7 +84,6 @@ def linear_regression_from_df(data,m_name):
     return df
 
 
-
 def task_performance(tasks_, which_matrix):
     correct = 0
     for t in tasks_:
@@ -104,9 +103,10 @@ def matrix_from_prob(prob_i_j_):
 
     for i in range(attitude_matrix_.shape[0]):
         for j in range(attitude_matrix_.shape[1]):
-            is_max = np.where(prob_i_j_[i,j,:] == np.max(prob_i_j_[i,j,:]))[0]
-            median_max = is_max[int(len(is_max) / 2)]
-            attitude_matrix_[i, j] = (median_max + 1.0) / (num_discrete + 1.0)
+            if i != j:
+                is_max = np.where(prob_i_j_[i,j,:] == np.max(prob_i_j_[i,j,:]))[0]
+                median_max = is_max[int(len(is_max) / 2)]
+                attitude_matrix_[i, j] = median_max / float(num_discrete) + (1.0 / float(num_discrete * 2.0))
             # attitude_matrix_[i,j] = (np.argmax(prob_i_j_[i,j,:]) + 1.0) / (num_discrete+1.0)
             # attitude_matrix_[i, j] = np.sum(np.multiply(np.arange(1, num_discrete + 1) / (num_discrete+1.0), prob_i_j_[i,j,:]))
     return attitude_matrix_
@@ -135,15 +135,15 @@ for subject_id, a in x.items():
 
         # initialize the probabilities
         prob_i_j = np.ones([3, 4, num_discrete]) / float(num_discrete)
-        attitude_matrix = np.zeros(prob_i_j.shape[:2])
+        attitude_matrix = matrix_from_prob(prob_i_j)
         optimal_prob_i_j = np.ones([3, 4, num_discrete]) / float(num_discrete)
         sequence_prob_i_j = np.ones([3, 4, num_discrete]) / float(num_discrete)
 
         tasks = []
-        error = []
-        local_error = []
-        global_error = []
-        sequence_error = []
+        error = [np.mean(np.power(attitude_matrix[:] - real_matrix[section_id][:], 2.0))]
+        local_error = [np.mean(np.power(attitude_matrix[:] - real_matrix[section_id][:], 2.0))]
+        global_error = [np.mean(np.power(attitude_matrix[:] - real_matrix[section_id][:], 2.0))]
+        sequence_error = [np.mean(np.power(attitude_matrix[:] - real_matrix[section_id][:], 2.0))]
         the_sequence = []
         for turn, c in b.items():
             if 'q' not in str(turn):
@@ -160,6 +160,8 @@ for subject_id, a in x.items():
 
         print(subject_id, section_id, len(the_sequence))
 
+        if subject_id == 1002.0 and section_id == 2:
+            print()
         for turn, c in b.items():
             # for each turn, a different agent does something
 
@@ -282,6 +284,7 @@ for subject_id, a in x.items():
         ax.set(xlabel='Time', ylabel='error',title= 'subject_id: '+str(subject_id)+" , "+'section_id: '+str(section_id))
 
         ax.legend()
+        plt.ylim([0.0, 0.17])
 
         f.canvas.draw()
         plt.draw()
