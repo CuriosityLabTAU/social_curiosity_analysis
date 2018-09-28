@@ -110,6 +110,8 @@ personal_info_data.set_index('pt1uniqueID',inplace=True)
 
 # print personal_info_data
 
+
+
 #all pt1 concat
 all_pt1_matan = pd.concat([BFI_score,AQ_score,NARS_score,personal_info_data], axis=1)
 all_pt1_matan.to_csv('data/qualtrics/pt.1/processed_pt1.csv')

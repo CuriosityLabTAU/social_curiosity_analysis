@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import copy
-
-#
+import seaborn as sns
+sns.set()
 
 # load data
 # MATAN:
@@ -51,6 +51,38 @@ real_matrix = [bin_matrix(np.array([[0 , 0.7 , 0.9 , 0.9],[0.9 , 0  ,0.1  ,0.5],
                bin_matrix(np.array([[0, 0.9, 0.15, 0.5], [0.75, 0, 0.45, 0.9], [0.3, 0.6, 0, 0.1]])),
                bin_matrix(np.array([[0, 0.45, 0.75, 0.5], [0.6, 0, 0.3, 0.1], [0.9, 0.15, 0, 0.9]])),
                bin_matrix(np.array([[0, 0.3, 0.6, 0.9], [0.15, 0, 0.9, 0.1], [0.45, 0.75, 0, 0.5]]))]
+
+
+def linear_regression_from_df(data,m_name):
+    subjects=[]
+    m_list=[]
+    for row in data.iterrows():
+
+        y = row[1].values.tolist()
+        len_x = len(y)
+        y = np.array(y)
+        x = [i for i in range(len_x)]
+        x = np.array(x)
+
+        #take out nones:
+        none_index=np.argwhere(np.isnan(y))
+        y=np.delete(y, none_index, 0)
+        x=np.delete(x, none_index, 0)
+        #start from 0:
+        y=y-y[0]
+
+        # crate x for a non intercepted linear regressio
+        x = x[:, np.newaxis]
+
+        #run linear regression
+        m, _, _, _ = np.linalg.lstsq(x, y)
+        m_list.append(m)
+        subjects.append(row[0])
+
+    df = pd.DataFrame(np.column_stack([m_list]),columns=[m_name],index=subjects)
+    df.columns.names = ['subject_id']
+    return df
+
 
 
 def task_performance(tasks_, which_matrix):
@@ -237,17 +269,43 @@ for subject_id, a in x.items():
         dict_for_measure_df[subject_id]['b_local_'+str(section_id)]        =  np.mean(error - local_error)
         dict_for_measure_df[subject_id]['b_sequence_'+str(section_id)]     =  np.mean(error - sequence_error)
 
-        # if subject_id == 1002.0:
-        #     plt.plot(error, 'b')
-        #     plt.plot(local_error, 'k')
-        #     plt.plot(global_error, 'r')
-        #     plt.plot(sequence_error, 'c')
-        #     plt.legend(['error', 'local', 'global', 'sequence'])
-        #     plt.show()
+        f, ax = plt.subplots(1, 1)
+
+        a = sns.lineplot(data=error, label='error')
+        b = sns.lineplot(data=local_error,    label=r"$\beta_{\rm local}$")
+        c = sns.lineplot(data=global_error,   label=r"$\beta_{\rm global}$")
+        d = sns.lineplot(data=sequence_error, label=r"$\beta_{\rm sequence}$")
+
+        ax.set(xlabel='Time', ylabel='error',title= 'subject_id: '+str(subject_id)+" , "+'section_id: '+str(section_id))
+
+        ax.legend()
+        plt.show()
 
 all_measure_df=pd.DataFrame.from_dict(dict_for_measure_df, orient='index')
 all_measure_df.reset_index(inplace=True)
 all_measure_df=all_measure_df.rename(columns = {'index':'Subject_ID'})
+
+
+#### add ms'
+all_measure_df.set_index('Subject_ID',inplace=True)
+
+
+b_local_list = ['b_local_0', 'b_local_1', 'b_local_2', 'b_local_3', 'b_local_4']
+b_global_list = ['b_global_0', 'b_global_1', 'b_global_2', 'b_global_3', 'b_global_4']
+b_sequence_list = ['b_sequence_0', 'b_sequence_1', 'b_sequence_2', 'b_sequence_3', 'b_sequence_4']
+delta_list = ['delta_0', 'delta_1', 'delta_2', 'delta_3', 'delta_4']
+delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1', 'delta_tilde_2', 'delta_tilde_3', 'delta_tilde_4']
+
+m_b_local = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_local')
+b_global = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_global')
+b_sequence = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_sequence')
+delta = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_delta')
+delta_tilde = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_delta_tilde')
+
+all_measure_df = pd.concat([m_b_local, b_global, b_sequence, delta, delta_tilde,all_measure_df], axis=1)
+
+all_measure_df.reset_index(inplace=True)
+
 
 all_measure_df.to_csv(output_path,index=False)
 
@@ -281,6 +339,6 @@ def figure_1():
 # sequence behavior: error in matrix [DONE]
 
 
-for subject_id, a in x.items():
-    for section_id, b in a.items():
-        print(subject_id, section_id, b['measures'])
+# for subject_id, a in x.items():
+#     for section_id, b in a.items():
+#         print(subject_id, section_id, b['measures'])

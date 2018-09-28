@@ -23,6 +23,39 @@ all_internal = pd.read_csv(open(internal_filename))
 all_internal.set_index('Subject_ID', inplace=True)
 all_internal.dropna(inplace=True)
 
+def linear_regression_from_df(data,m_name):
+    subjects=[]
+    m_list=[]
+    for row in data.iterrows():
+
+        y = row[1].values.tolist()
+        len_x = len(y)
+        y = np.array(y)
+        x = [i for i in range(len_x)]
+        x = np.array(x)
+
+        #take out nones:
+        none_index=np.argwhere(np.isnan(y))
+        y=np.delete(y, none_index, 0)
+        x=np.delete(x, none_index, 0)
+        #start from 0:
+        y=y-y[0]
+
+        # crate x for a non intercepted linear regressio
+        x = x[:, np.newaxis]
+
+        #run linear regression
+        m, _, _, _ = np.linalg.lstsq(x, y)
+        m_list.append(m)
+        subjects.append(row[0])
+
+    df = pd.DataFrame(np.column_stack([m_list]),columns=[m_name],index=subjects)
+    df.columns.names = ['subject_id']
+    return df
+
+
+
+
 def AMT_histogram():
     AMT_data = pd.read_csv('data/amt_probs/probs_from_AMT.csv')
     # preprocessing:
@@ -148,7 +181,7 @@ def delta_over_time():
 
     ax.axes.set_title(r'$\delta$ and $\delta$~  over time')
 
-    random = (1.0 / 3 + (1.0 / 3) * (1.0 / 3) + (1.0 / 3) * (1.0 / 2)) * 2
+    random = (1.0 / 3 + 1.0 / 2) * 2
 
     ax.axhline(linewidth=2, color='r', y=random, linestyle=':')
 
@@ -180,8 +213,6 @@ def delta_over_time():
 
     tt_df = pd.DataFrame.from_dict(tt_dict, orient='index')
     print tt_df
-
-
 delta_over_time()
 
 def delta_vs_b():
@@ -205,4 +236,21 @@ def delta_vs_b():
     plt.show()
 # delta_vs_b()
 
+def add_m_s():
+    b_local_list=['b_local_0','b_local_1','b_local_2','b_local_3','b_local_4']
+    b_global_list=['b_global_0','b_global_1','b_global_2','b_global_3','b_global_4']
+    b_sequence_list=['b_sequence_0','b_sequence_1','b_sequence_2','b_sequence_3','b_sequence_4']
+    delta_list=['delta_0','delta_1','delta_2','delta_3','delta_4']
+    delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1','delta_tilde_2' ,'delta_tilde_3', 'delta_tilde_4']
 
+
+    m_b_local=linear_regression_from_df(all_internal[b_local_list[1:]],'m_b_local')
+    b_global=linear_regression_from_df(all_internal[b_local_list[1:]],'m_b_global')
+    b_sequence=linear_regression_from_df(all_internal[b_local_list[1:]],'m_b_sequence')
+    delta=linear_regression_from_df(all_internal[b_local_list[1:]],'m_delta')
+    delta_tilde=linear_regression_from_df(all_internal[b_local_list[1:]],'m_delta_tilde')
+
+    all_ms= pd.concat([m_b_local,b_global,b_sequence,delta,delta_tilde], axis=1)
+
+    print all_ms
+# add_m_s()
