@@ -183,23 +183,42 @@ def delta_over_time():
     print tt_df
 # delta_over_time()
 
-def delta_vs_b():
-    b_local_list=['b_local_0','b_local_1','b_local_2','b_local_3','b_local_4']
-    delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1','delta_tilde_2' ,'delta_tilde_3', 'delta_tilde_4']
+def delta_tilde_vs_b():
+    b_error_list=['b_error_0','b_error_1','b_error_2','b_error_3','b_error_4']
+    # b_local_list = ['b_local_0', 'b_local_1', 'b_local_2', 'b_local_3', 'b_local_4']
+    delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1', 'delta_tilde_2', 'delta_tilde_3', 'delta_tilde_4']
 
     f, axes = plt.subplots(3, 2)
 
     for i in range(5):
-        data= all_internal[[b_local_list[i],delta_tilde_list[i]]]
+        data= all_internal[[b_error_list[i],delta_tilde_list[i]]]
 
-        a = sns.regplot(x=b_local_list[i], y=delta_tilde_list[i], data=data, x_estimator=np.mean ,ax=axes[int(i / 2), i % 2],)
-        title=r"$\delta$~_"+str(i)+" vs "+r"$\beta_{\rm local}$_"+str(i)
+        a = sns.regplot(x=b_error_list[i], y=delta_tilde_list[i], data=data, x_estimator=np.mean ,ax=axes[int(i / 2), i % 2],)
+        title=r"$\delta$~_"+str(i)+" vs "+r"$\beta_{\rm error}$_"+str(i)
         a.set(xlabel='Relationship Representation ', ylabel='Frequency',)
         a.axes.set_title(title)
 
         print title
-        result = sm.ols(formula=b_local_list[i]+'~'+delta_tilde_list[i], data=data).fit()
+        result = sm.ols(formula=b_error_list[i]+'~'+delta_tilde_list[i], data=data).fit()
         print result.summary()
 
     plt.show()
-delta_vs_b()
+
+
+def delta_vs_error():
+    data = {
+        'x': [],
+        'y': []
+    }
+    for i in range(5):
+        data['x'].extend([j[0] for j in all_internal[['b_local_%d' % i]].values.tolist()])
+        data['y'].extend([j[0] for j in all_internal[['delta_tilde_%d' % i]].values.tolist()])
+    df = pd.DataFrame.from_dict(data=data)
+    print(df.head())
+    a = sns.regplot(x='x', y='y', x_estimator=np.mean, data=df)
+
+    result = sm.ols(formula='y ~ x', data=df).fit()
+    print result.summary()
+    plt.show()
+
+delta_vs_error()

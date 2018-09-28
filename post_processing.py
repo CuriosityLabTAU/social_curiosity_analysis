@@ -22,6 +22,8 @@ beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
 
 x = pickle.load(open(data_path+filename, 'rb'))
 
+measures_list = []
+
 # load behavior_relationship probability
 
 num_discrete = beh_rel_prob.shape[1]
@@ -84,10 +86,10 @@ def linear_regression_from_df(data,m_name):
     return df
 
 
-def task_performance(tasks_, which_matrix):
+def task_performance(tasks_, which_matrix, which_answer='subject_answer'):
     correct = 0
     for t in tasks_:
-        correct += int(t['subject_answer'] == t[which_matrix])
+        correct += int(t[which_answer] == t[which_matrix])
     return correct
 
 
@@ -172,6 +174,10 @@ for subject_id, a in x.items():
             if 'q' in str(turn):
                 answers = task_from_matrix(attitude_matrix)
                 c['learned_matrix'] = str(int(answers[int(turn[-1])]))
+
+                answers = task_from_matrix(real_matrix[section_id])
+                c['real_matrix'] = str(int(answers[int(turn[-1])]))
+
                 tasks.append(c)
 
             else: # analyze behavior and resulting matrix / learning
@@ -265,20 +271,31 @@ for subject_id, a in x.items():
 
         # MEASURES:
         b['measures'] = {}
-        b['measures']['delta'] = task_performance(tasks, 'right_answer')
-        b['measures']['delta_tilde'] = task_performance(tasks, 'learned_matrix')
+        b['measures']['delta'] = task_performance(tasks, 'right_answer', 'subject_answer')
+        b['measures']['delta_tilde'] = task_performance(tasks, 'learned_matrix', 'subject_answer')
+        b['measures']['ground_truth'] = task_performance(tasks, 'real_matrix', 'right_answer')
+        b['measures']['delta_tag'] = task_performance(tasks, 'learned_matrix', 'right_answer')
 
         b['measures']['b_error'] = error[-1]
         b['measures']['b_global'] = np.mean(error - global_error)
         b['measures']['b_local'] = np.mean(error - local_error)
         b['measures']['b_sequence'] = np.mean(error - sequence_error)
 
-        dict_for_measure_df[subject_id]['delta_'+str(section_id)]         = task_performance(tasks, 'right_answer')
-        dict_for_measure_df[subject_id]['delta_tilde_'+str(section_id)]   = task_performance(tasks, 'learned_matrix')
-        dict_for_measure_df[subject_id]['b_error' + str(section_id)] = error[-1]
-        dict_for_measure_df[subject_id]['b_global_'+str(section_id)]      =  np.mean(error - global_error)
-        dict_for_measure_df[subject_id]['b_local_'+str(section_id)]        =  np.mean(error - local_error)
-        dict_for_measure_df[subject_id]['b_sequence_'+str(section_id)]     =  np.mean(error - sequence_error)
+        if len(measures_list) == 0:
+            measures_list = b['measures'].keys()
+
+        for measures in measures_list:
+            dict_for_measure_df[subject_id][measures + '_' + str(section_id)] = b['measures'][measures]
+            
+        #     
+        # dict_for_measure_df[subject_id]['delta_'+str(section_id)]         = task_performance(tasks, 'right_answer')
+        # dict_for_measure_df[subject_id]['delta_tilde_'+str(section_id)]   = task_performance(tasks, 'learned_matrix')
+        # dict_for_measure_df[subject_id]['ground_truth_'+str(section_id)]         = task_performance(tasks, 'right_answer')
+        # dict_for_measure_df[subject_id]['delta_tilde_'+str(section_id)]   = task_performance(tasks, 'learned_matrix')
+        # dict_for_measure_df[subject_id]['b_error' + str(section_id)] = error[-1]
+        # dict_for_measure_df[subject_id]['b_global_'+str(section_id)]      =  np.mean(error - global_error)
+        # dict_for_measure_df[subject_id]['b_local_'+str(section_id)]        =  np.mean(error - local_error)
+        # dict_for_measure_df[subject_id]['b_sequence_'+str(section_id)]     =  np.mean(error - sequence_error)
 
         plt.cla()
         a = sns.lineplot(data=error, label='error')
@@ -302,22 +319,14 @@ all_measure_df=all_measure_df.rename(columns = {'index':'Subject_ID'})
 #### add ms'
 all_measure_df.set_index('Subject_ID',inplace=True)
 
+df_measures_list = []
+for measures in measures_list:
+    measure_sections = [measures + '_%d' % i for i in range(5)]
+    m_measure = linear_regression_from_df(all_measure_df[measure_sections[1:]], 'm_' + measures)
+    df_measures_list.append(copy.deepcopy(m_measure))
 
-b_error_list = ['b_error_0', 'b_error_1', 'b_error_2', 'b_error_3', 'b_error_4']
-b_local_list = ['b_local_0', 'b_local_1', 'b_local_2', 'b_local_3', 'b_local_4']
-b_global_list = ['b_global_0', 'b_global_1', 'b_global_2', 'b_global_3', 'b_global_4']
-b_sequence_list = ['b_sequence_0', 'b_sequence_1', 'b_sequence_2', 'b_sequence_3', 'b_sequence_4']
-delta_list = ['delta_0', 'delta_1', 'delta_2', 'delta_3', 'delta_4']
-delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1', 'delta_tilde_2', 'delta_tilde_3', 'delta_tilde_4']
-
-m_b_error = linear_regression_from_df(all_measure_df[b_error_list[1:]], 'm_b_error')
-m_b_local = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_local')
-b_global = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_global')
-b_sequence = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_b_sequence')
-delta = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_delta')
-delta_tilde = linear_regression_from_df(all_measure_df[b_local_list[1:]], 'm_delta_tilde')
-
-all_measure_df = pd.concat([m_b_error, m_b_local, b_global, b_sequence, delta, delta_tilde,all_measure_df], axis=1)
+df_measures_list.append(all_measure_df)
+all_measure_df = pd.concat(df_measures_list, axis=1)
 
 all_measure_df.reset_index(inplace=True)
 
