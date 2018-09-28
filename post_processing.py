@@ -100,15 +100,18 @@ def update_bayes(prob_i_j_, i_robot_, j_robot_, behavior_):
 
 def matrix_from_prob(prob_i_j_):
     attitude_matrix_ = np.zeros(prob_i_j_.shape[:2])
+    values = np.arange(num_discrete) / float(num_discrete) + (1.0 / float(num_discrete * 2.0))
 
     for i in range(attitude_matrix_.shape[0]):
         for j in range(attitude_matrix_.shape[1]):
             if i != j:
                 is_max = np.where(prob_i_j_[i,j,:] == np.max(prob_i_j_[i,j,:]))[0]
                 median_max = is_max[int(len(is_max) / 2)]
-                attitude_matrix_[i, j] = median_max / float(num_discrete) + (1.0 / float(num_discrete * 2.0))
+                # attitude_matrix_[i, j] = values[median_max]
             # attitude_matrix_[i,j] = (np.argmax(prob_i_j_[i,j,:]) + 1.0) / (num_discrete+1.0)
-            # attitude_matrix_[i, j] = np.sum(np.multiply(np.arange(1, num_discrete + 1) / (num_discrete+1.0), prob_i_j_[i,j,:]))
+                expectation_value = np.sum(np.multiply(values, prob_i_j_[i,j,:]))
+                attitude_matrix_[i, j] = values.flat[np.abs(values - expectation_value).argmin()]
+
     return attitude_matrix_
 
 
