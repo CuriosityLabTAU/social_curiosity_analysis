@@ -9,14 +9,14 @@ import statsmodels.formula.api as sm
 from scipy import stats
 
 # #Matan lab
-external_filename = 'data/all_external_data.csv'
-internal_filename = 'data/external_and_internal_data/all_internal_data.csv'
+# external_filename = 'data/all_external_data.csv'
+# internal_filename = 'data/external_and_internal_data/all_internal_data.csv'
 
 
 #Goren
-# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-# external_filename = data_path+'all_data/all_external_data.csv'
-# internal_filename = data_path+'all_data/all_internal_data.csv'
+data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+external_filename = data_path+'all_data/all_external_data.csv'
+internal_filename = data_path+'all_data/all_internal_data.csv'
 
 
 all_internal = pd.read_csv(open(internal_filename))

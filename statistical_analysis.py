@@ -13,7 +13,7 @@ import statsmodels.formula.api as sm
 # GOREN:
 data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
 external_filename = 'all_data/all_external_data.csv'
-internal_filename = 'all_data/all_internal_data.csv'
+internal_filename = 'all_data/all_internal_data_no_sequence.csv'
 # filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
 
 all_external = pd.read_csv(open(data_path + external_filename))
@@ -79,9 +79,9 @@ def factor_scores(all_measures_, fa_, n_factors=4):
 
 
 def calc_correlation(all_measures_, factor_names):
-    interesting_measures = [#'S_Curiosity', 'T_Curiosity', 'SCS_total_score', 'General_Social_Curiosity', 'Covert_Social_Curiosity',
-                            '_5DC_Social_Curiosity', '_5DC_Joyous_Exploration', '_5DC_Deprivation_Sensitivity', '_5DC_Stress_Tolerance', '_5DC_Thrill_Seeking'
-#                            'CEI_2_total_score', 'AQ_total_score', 'Openness', 'Neuroticism', 'pet', 'avg_grades'
+    interesting_measures = ['S_Curiosity', 'T_Curiosity', 'SCS_total_score', 'General_Social_Curiosity', 'Covert_Social_Curiosity',
+                            '_5DC_Social_Curiosity', '_5DC_Joyous_Exploration', '_5DC_Deprivation_Sensitivity', '_5DC_Stress_Tolerance', '_5DC_Thrill_Seeking',
+                           'CEI_2_total_score', 'AQ_total_score', 'Openness', 'Neuroticism', 'pet', 'avg_grades'
     ]
 
     ylabel_map = {
@@ -169,13 +169,14 @@ def calc_correlation(all_measures_, factor_names):
     #         pass
     #     plt.show()
 
+n_factors = 4
 all_measures = all_data[internal_columns]
-fa = the_fa(all_measures, 4)
-# scree_plot(fa)
+fa = the_fa(all_measures, n_factors)
+scree_plot(fa)
 
-fa = the_fa(all_measures, 4)
-print_factors(fa, 4)
-factor_df = factor_scores(all_measures, fa, 4)
+fa = the_fa(all_measures, n_factors)
+print_factors(fa, n_factors)
+factor_df = factor_scores(all_measures, fa, n_factors)
 factor_names = list(factor_df.columns)
 factor_names.append('age')
 factor_names.append('gender')

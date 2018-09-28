@@ -8,17 +8,17 @@ sns.set()
 
 # load data
 # MATAN:
-data_path = 'data/'
-filename = 'robot_interaction_data/raw_data_28-09-2018_18:27'
-beh_rel_prob = pd.read_csv('data/amt_probs/probs_from_AMT.csv').values
-output_path = 'data/external_and_internal_data/all_internal_data.csv'
+# data_path = 'data/'
+# filename = 'robot_interaction_data/raw_data_28-09-2018_18:27'
+# beh_rel_prob = pd.read_csv('data/amt_probs/probs_from_AMT.csv').values
+# output_path = 'data/external_and_internal_data/all_internal_data.csv'
 
 # GOREN:
-# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-# # filename = 'all_data/raw_data_25-09-2018_09_30'
-# filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
-# output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
-# beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
+data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+# filename = 'all_data/raw_data_25-09-2018_09_30'
+filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
+output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
+beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
 
 x = pickle.load(open(data_path+filename, 'rb'))
 
