@@ -22,7 +22,7 @@ all_external.set_index('Subject_ID', inplace=True)
 
 all_internal = pd.read_csv(open(data_path + internal_filename)).dropna()
 all_internal.set_index('Subject_ID', inplace=True)
-internal_columns = [a for a in all_internal.columns if 'ground' not in a and 'sequence' not in a and '_2' not in a and '_3' not in a] # and '_4' not in a]
+internal_columns = [a for a in all_internal.columns if 'ground' not in a and 'sequence' not in a and '_2' not in a and '_3' not in a and 'error' not in a] # and '_4' not in a]
 
 
 all_data = pd.concat([all_external, all_internal], axis=1)
@@ -177,7 +177,7 @@ def calc_correlation(all_measures_, factor_names):
 n_factors = 5
 all_measures = all_data[internal_columns]
 fa = the_fa(all_measures, n_factors)
-scree_plot(fa)
+# scree_plot(fa)
 
 fa = the_fa(all_measures, n_factors)
 print_factors(fa, n_factors)
@@ -194,3 +194,8 @@ all_data = pd.concat([all_data, factor_df], axis=1)
 print(all_data.shape)
 
 calc_correlation(all_data, factor_names)
+
+# the_formula = 'SCS_total_score ~ Factor1 * Factor5 + gender'
+# print(the_formula)
+# result = sm.ols(formula=the_formula, data=all_data).fit()
+# print result.summary()
