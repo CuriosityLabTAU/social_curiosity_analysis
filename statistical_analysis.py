@@ -13,22 +13,32 @@ import statsmodels.formula.api as sm
 # GOREN:
 data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
 external_filename = 'all_data/all_external_data.csv'
-internal_filename = 'all_data/all_internal_data_no_sequence.csv'
+internal_filename = 'all_data/all_internal_data.csv'
 # filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
 
 all_external = pd.read_csv(open(data_path + external_filename))
 all_external = all_external[all_external.Subject_ID.notnull()]
 all_external.set_index('Subject_ID', inplace=True)
 
-all_internal = pd.read_csv(open(data_path + internal_filename))
+all_internal = pd.read_csv(open(data_path + internal_filename)).dropna()
 all_internal.set_index('Subject_ID', inplace=True)
-internal_columns = all_internal.columns
+internal_columns = [a for a in all_internal.columns if 'ground' not in a and 'sequence' not in a and '_2' not in a and '_3' not in a and '_4' not in a]
 
 
 all_data = pd.concat([all_external, all_internal], axis=1)
 all_data = all_data[all_data.b_local_0.notnull()]
 print(all_data.shape)
 
+interesting_measures = [
+    'S_Curiosity', 'T_Curiosity',
+    'SCS_total_score', 'General_Social_Curiosity', '_5DC_Social_Curiosity',
+    'Covert_Social_Curiosity',
+    '_5DC_Joyous_Exploration', '_5DC_Deprivation_Sensitivity',
+    '_5DC_Stress_Tolerance', '_5DC_Thrill_Seeking',
+    'CEI_2_total_score', 'AQ_total_score',
+    'pet', 'avg_grades',
+    'Openness', 'Neuroticism', 'Extraversion', 'Agreeableness', 'Conscientiousness'
+]
 
 # Factor analysis
 # step 0.
@@ -79,11 +89,6 @@ def factor_scores(all_measures_, fa_, n_factors=4):
 
 
 def calc_correlation(all_measures_, factor_names):
-    interesting_measures = ['S_Curiosity', 'T_Curiosity', 'SCS_total_score', 'General_Social_Curiosity', 'Covert_Social_Curiosity',
-                            '_5DC_Social_Curiosity', '_5DC_Joyous_Exploration', '_5DC_Deprivation_Sensitivity', '_5DC_Stress_Tolerance', '_5DC_Thrill_Seeking',
-                           'CEI_2_total_score', 'AQ_total_score', 'Openness', 'Neuroticism', 'pet', 'avg_grades'
-    ]
-
     ylabel_map = {
         'psychometric_grade': 'PET',
         'AQ_total_score': 'AQ score',
@@ -169,19 +174,20 @@ def calc_correlation(all_measures_, factor_names):
     #         pass
     #     plt.show()
 
-n_factors = 4
+n_factors = 5
 all_measures = all_data[internal_columns]
 fa = the_fa(all_measures, n_factors)
-scree_plot(fa)
+# scree_plot(fa)
 
 fa = the_fa(all_measures, n_factors)
 print_factors(fa, n_factors)
 factor_df = factor_scores(all_measures, fa, n_factors)
 factor_names = list(factor_df.columns)
-factor_names.append('age')
-factor_names.append('gender')
-factor_names.append('NARS_total_score')
-factor_names.append('Anthropomorphism')
+# factor_names.append('age')
+# factor_names.append('gender')
+# factor_names.append('NARS_total_score')
+# factor_names.append('Anthropomorphism')
+# factor_names.append('Animacy')
 
 
 all_data = pd.concat([all_data, factor_df], axis=1)

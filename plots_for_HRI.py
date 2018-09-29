@@ -181,7 +181,7 @@ def delta_over_time():
 
     tt_df = pd.DataFrame.from_dict(tt_dict, orient='index')
     print tt_df
-# delta_over_time()
+delta_over_time()
 
 def delta_tilde_vs_b():
     b_error_list=['b_error_0','b_error_1','b_error_2','b_error_3','b_error_4']
@@ -205,12 +205,12 @@ def delta_tilde_vs_b():
     plt.show()
 
 
-def delta_vs_error():
+def delta_tag_vs_error():
     data = {
         'x': [],
         'y': []
     }
-    for i in range(5):
+    for i in range(3, 4):
         data['x'].extend([j[0] for j in all_internal[['b_local_%d' % i]].values.tolist()])
         data['y'].extend([j[0] for j in all_internal[['delta_tilde_%d' % i]].values.tolist()])
     df = pd.DataFrame.from_dict(data=data)
@@ -221,4 +221,4 @@ def delta_vs_error():
     print result.summary()
     plt.show()
 
-delta_vs_error()
+# delta_tag_vs_error()
