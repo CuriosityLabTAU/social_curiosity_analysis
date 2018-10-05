@@ -4,28 +4,31 @@ import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.gridspec as gridspec
-sns.set()
+sns.set_style("darkgrid", {"axes.facecolor": "#DDE5EE"})
+# sns.set()
 import statsmodels.formula.api as sm
 from scipy import stats
+from matplotlib.ticker import MaxNLocator
 
 # #Matan lab
-# external_filename = 'data/all_external_data.csv'
-# internal_filename = 'data/external_and_internal_data/all_internal_data.csv'
-
+external_filename = 'data/all_external_data.csv'
+internal_filename = 'data/all_internal_data.csv'
 
 #Goren
-data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-external_filename = data_path+'all_data/all_external_data.csv'
-internal_filename = data_path+'all_data/all_internal_data.csv'
+# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+# external_filename = data_path+'all_data/all_external_data.csv'
+# internal_filename = data_path+'all_data/all_internal_data.csv'
 
 
 all_internal = pd.read_csv(open(internal_filename))
 all_internal.set_index('Subject_ID', inplace=True)
 all_internal.dropna(inplace=True)
 
+title_font = {'fontname':'Arial', 'size':'18', 'color':'black', 'weight':'bold',
+              'verticalalignment':'bottom'}
 
 def AMT_histogram():
-    AMT_data = pd.read_csv('data/amt_probs/probs_from_AMT.csv')
+    AMT_data = pd.read_csv('data/AMT_row.csv')
     # preprocessing:
     columns = ['Duration (in seconds)', 'Finished', 'RecordedDate', 'Q1.2', 'Q1.3', 'Q1.4', 'Q1.5', 'Q0_11', 'Q1_11',
                'Q2_11', 'Q3_11', 'Q4_11', 'Q5_11',
@@ -73,18 +76,41 @@ def AMT_histogram():
 
 
     f, axes = plt.subplots(5, 3,constrained_layout=True)
+    plt.subplots_adjust(top=.9, bottom=0.1)
 
     for i in range(0,15):
 
         a = sns.distplot(AMT_data[i],bins=9,kde=False,ax=axes[int(i/3),i%3] ,color='teal')
 
-        a.set(xlabel='Relationship Representation ', ylabel='Frequency',title='Guster Number = '+str(i),ylim=(0, 40),xlim=(0, 1))
-        a.axes.set_title('Guster Number = '+str(i), weight='bold')
+        if int(i%3)== 0:
+            a.set_ylabel('Frequency' , fontsize = 23 )
+        else:
+            a.set(yticklabels=[])
+            a.set_xlabel("", fontsize=0.1)
+
+
+        if i/3==4:
+            a.set_xlabel('Relationship Representation' ,fontsize=23 )
+
+        else:
+            a.set(xticklabels=[])
+            a.set_xlabel("", fontsize=0.1)
+
+        a.tick_params(axis='y', labelsize=15)
+        a.tick_params(axis='x', labelsize=15)
+
+        a.set(ylim=(0, 35),xlim=(0, 1))
+        a.text(.97, .85, str(i), horizontalalignment='right', transform=a.transAxes, weight='bold' ,fontsize=22)
+
+
     plt.show()
 # AMT_histogram()
 
 def b_over_time():
-    f, ax = plt.subplots(1, 1)
+    a_color='#FFB38A'
+    b_color='#1278A1'
+
+    f, ax = plt.subplots(1, 1,figsize=(16,6))
 
     b_local_list=['b_local_0','b_local_1','b_local_2','b_local_3','b_local_4']
     b_global_list=['b_global_0','b_global_1','b_global_2','b_global_3','b_global_4']
@@ -92,95 +118,139 @@ def b_over_time():
 
 
     b_local_data= all_internal[b_local_list]
-    b_local_data.columns = [i for i in xrange(0,5)]
+    b_local_data.columns = [i for i in xrange(1,6)]
     b_local_data = pd.melt(b_local_data, var_name="Time", value_name="Score")
 
-    a = sns.regplot(x="Time", y="Score", data=b_local_data,  x_estimator=np.mean, label=r"$\beta_{\rm local}$")
+    a = sns.regplot(x="Time", y="Score", data=b_local_data, color=b_color ,  x_estimator=np.mean ,label=r"$b_{\rm local}$",line_kws={'linestyle':"-"})
 
     b_global_data= all_internal[b_global_list]
-    b_global_data.columns = [i for i in xrange(0,5)]
+    b_global_data.columns = [i for i in xrange(1,6)]
     b_global_data = pd.melt(b_global_data, var_name="Time", value_name="Score")
 
-    b = sns.regplot(x="Time", y="Score", data=b_global_data,  x_estimator=np.mean,label=r"$\beta_{\rm global}$")
+    b = sns.regplot(x="Time", y="Score", data=b_global_data, color=a_color , x_estimator=np.mean,label=r"$b_{\rm global}$")
+    # b.set(xlabel='Session Number', ylabel='Error' ,fontsize=23)
 
     b_sequence_data= all_internal[b_sequence_list]
     b_sequence_data.columns = [i for i in xrange(0,5)]
     b_sequence_data = pd.melt(b_sequence_data, var_name="Time", value_name="Score")
 
-    b = sns.regplot(x="Time", y="Score", data=b_sequence_data,  x_estimator=np.mean,label=r"$\beta_{\rm sequence}$")
+    # b = sns.regplot(x="Time", y="Score", data=b_sequence_data,  x_estimator=np.mean,label=r"$\beta_{\rm sequence}$")
+    # ax.legend()
 
-    ax.axes.set_title(r'$\beta_{\rm local}$, $\beta_{\rm global}$ and $\beta_{\rm sequence}$ over time')
+    a.set_xlabel('Session Number', fontsize=23)
+    a.set_ylabel('Error', fontsize=23)
 
-    ax.legend()
 
+    # ax.axes.set_title(r'(a)', **title_font )
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    ax.tick_params(axis='y', labelsize=15)
+    ax.tick_params(axis='x', labelsize=15)
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    plt.setp(ax.get_legend().get_texts(), fontsize='24') # for legend text
+    a.text(.05, .93, '(a)', horizontalalignment='right', transform=a.transAxes, weight='bold', fontsize=22)
+
+    # ax.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", mode="expand", borderaxespad=0, ncol=3 , handlelength=3)
     plt.show()
 
-    print 'b_local vs time '
-    result = sm.ols(formula='Time ~ Score ', data=b_local_data).fit()
-    print result.summary()
-
-    print 'b_global vs time '
-    result = sm.ols(formula='Time ~ Score ', data=b_global_data).fit()
-    print result.summary()
-
-
-    print 'b_sequence vs time '
-    result = sm.ols(formula='Time ~ Score ', data=b_sequence_data).fit()
-    print result.summary()
-# b_over_time()
+    # print 'b_local vs time '
+    # result = sm.ols(formula='Time ~ Score ', data=b_local_data).fit()
+    # print result.summary()
+    #
+    # print 'b_global vs time '
+    # result = sm.ols(formula='Time ~ Score ', data=b_global_data).fit()
+    # print result.summary()
+    #
+    #
+    # print 'b_sequence vs time '
+    # result = sm.ols(formula='Time ~ Score ', data=b_sequence_data).fit()
+    # print result.summary()
+b_over_time()
 
 def delta_over_time():
-    f, ax = plt.subplots(1, 1)
+    a_color='teal'
+    b_color='#E47A2E'
+    c_color='#79C753'
+
+
+
+
+    f, ax = plt.subplots(1, 1,figsize=(16,6))
 
     delta_list=['delta_0','delta_1','delta_2','delta_3','delta_4']
     delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1','delta_tilde_2' ,'delta_tilde_3', 'delta_tilde_4']
+    delta_tag_list = ['delta_tag_0', 'delta_tag_1','delta_tag_2' ,'delta_tag_3', 'delta_tag_4']
+
+    delta_tag_data= all_internal[delta_tag_list]
+    delta_tag_data.columns = [i for i in xrange(1,6)]
+    delta_tag_data = pd.melt(delta_tag_data, var_name="Time", value_name="Score")
+
+    c = sns.regplot(x="Time", y="Score", data=delta_tag_data,color=b_color , x_estimator=np.mean, label=r"$\hat{l}$", line_kws={'linestyle':"-."})
+
 
     delta_data= all_internal[delta_list]
-    delta_data.columns = [i for i in xrange(0,5)]
+    delta_data.columns = [i for i in xrange(1,6)]
     delta_data = pd.melt(delta_data, var_name="Time", value_name="Score")
 
-    a = sns.regplot(x="Time", y="Score", data=delta_data,  x_estimator=np.mean, label=r"$\delta$")
+    a = sns.regplot(x="Time", y="Score", data=delta_data,color=a_color , x_estimator=np.mean, label=r"$l$", line_kws={'linestyle':"--"})
 
     delta_tilde_data= all_internal[delta_tilde_list]
-    delta_tilde_data.columns = [i for i in xrange(0,5)]
+    delta_tilde_data.columns = [i for i in xrange(1,6)]
     delta_tilde_data = pd.melt(delta_tilde_data, var_name="Time", value_name="Score")
 
-    b = sns.regplot(x="Time", y="Score", data=delta_tilde_data,  x_estimator=np.mean,label=r"$\delta$~")
 
-    ax.axes.set_title(r'$\delta$ and $\delta$~  over time')
+    b = sns.regplot(x="Time", y="Score", data=delta_tilde_data, color=c_color , x_estimator=np.mean,label=r"$\tilde{l}$",line_kws={'linestyle':'-'})
+    # b.set(xlabel='Session Number', ylabel='Performance')
+
+    # ax.axes.set_title(r'(b)', **title_font )
 
     random = (1.0 / 3 + 1.0 / 2) * 2
 
-    ax.axhline(linewidth=2, color='r', y=random, linestyle=':')
+    ax.axhline(linewidth=1.3, color='r', y=random, linestyle=":")
+    a.text(1.5, random +0.02, 'Random', horizontalalignment='right', color='r',
+           # transform=a.transAxes,
+           weight='bold', fontsize=19)
 
-    ax.legend()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+
+    ax.set_xlabel('Session Number', fontsize=23)
+    ax.set_ylabel('Performance', fontsize=23)
+    ax.tick_params(axis='y', labelsize=15)
+    ax.tick_params(axis='x', labelsize=15)
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    plt.setp(ax.get_legend().get_texts(), fontsize='24') # for legend text
+    # plt.setp(ax.get_legend().get_title(), fontsize='32') # for legend title
+    a.text(.05, .93, '(b)', horizontalalignment='right', transform=a.transAxes, weight='bold', fontsize=22)
 
     plt.show()
 
 
-    print 'delta vs time '
-    result = sm.ols(formula='Time ~ Score ', data=delta_data).fit()
-    print result.summary()
-
-    print 'tilde_tilde vs time '
-    result = sm.ols(formula='Time ~ Score ', data=delta_tilde_data).fit()
-    print result.summary()
-
-    delta_list=['delta_0','delta_1','delta_2','delta_3','delta_4']
-    delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1','delta_tilde_2' ,'delta_tilde_3', 'delta_tilde_4']
-
-    tt_dict={}
-    for i in range(5):
-        B=all_internal[delta_list[i]].values.tolist()
-        C=all_internal[delta_tilde_list[i]].values.tolist()
-
-        ttb=stats.ttest_ind(B, [random]*len(B))
-        ttc=stats.ttest_ind(C, [random]*len(C))
-
-        tt_dict[i]={'delta -t':ttb[0],'delta -p':ttb[1]/2,'delta~ -t':ttc[0],'delta~ -p':ttc[1]/2}
-
-    tt_df = pd.DataFrame.from_dict(tt_dict, orient='index')
-    print tt_df
+    # print 'delta vs time '
+    # result = sm.ols(formula='Time ~ Score ', data=delta_data).fit()
+    # print result.summary()
+    #
+    # print 'tilde_tilde vs time '
+    # result = sm.ols(formula='Time ~ Score ', data=delta_tilde_data).fit()
+    # print result.summary()
+    #
+    # delta_list=['delta_0','delta_1','delta_2','delta_3','delta_4']
+    # delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1','delta_tilde_2' ,'delta_tilde_3', 'delta_tilde_4']
+    #
+    # tt_dict={}
+    # for i in range(5):
+    #     B=all_internal[delta_list[i]].values.tolist()
+    #     C=all_internal[delta_tilde_list[i]].values.tolist()
+    #
+    #     ttb=stats.ttest_ind(B, [random]*len(B))
+    #     ttc=stats.ttest_ind(C, [random]*len(C))
+    #
+    #     tt_dict[i]={'delta -t':ttb[0],'delta -p':ttb[1]/2,'delta~ -t':ttc[0],'delta~ -p':ttc[1]/2}
+    #
+    # tt_df = pd.DataFrame.from_dict(tt_dict, orient='index')
+    # print tt_df
 delta_over_time()
 
 def delta_tilde_vs_b():
