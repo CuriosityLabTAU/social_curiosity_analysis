@@ -8,17 +8,17 @@ sns.set()
 
 # load data
 # MATAN:
-# data_path = 'data/'
-# filename = 'robot_interaction_data/raw_data_28-09-2018_18:27'
-# beh_rel_prob = pd.read_csv('data/amt_probs/probs_from_AMT.csv').values
-# output_path = 'data/external_and_internal_data/all_internal_data.csv'
+data_path = 'data/'
+filename = 'robot_interaction_data/raw_data_28-09-2018_18:27'
+beh_rel_prob = pd.read_csv('data/amt_probs/probs_from_AMT.csv').values
+output_path = 'data/external_and_internal_data/all_internal_data.csv'
 
 # GOREN:
-data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
-# filename = 'all_data/raw_data_28-09-2018_18_27'
-output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
-beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
+# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+# filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
+# # filename = 'all_data/raw_data_28-09-2018_18_27'
+# output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
+# beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
 
 x = pickle.load(open(data_path+filename, 'rb'))
 
@@ -90,6 +90,12 @@ def task_performance(tasks_, which_matrix, which_answer='subject_answer'):
     correct = 0
     for t in tasks_:
         correct += int(t[which_answer] == t[which_matrix])
+
+        # if which_matrix!='right_answer':
+        #     if  t[which_matrix]!=t[which_matrix+'_second_best']:
+        #         correct += 0.5*int(t[which_answer] == t[which_matrix +'_second_best'])
+
+
     return correct
 
 
@@ -123,6 +129,15 @@ def task_from_matrix(attitude_matrix_):
     answers[1] = np.argmin(np.sum(attitude_matrix_[:, :-1], axis=0))
     answers[2] = np.argmax(attitude_matrix_[:, -1])
     answers[3] = np.argmin(attitude_matrix_[:, -1])
+    return answers
+
+
+def task_from_matrix_second_best(attitude_matrix_):
+    answers = np.zeros([4])
+    answers[0] = np.sum(attitude_matrix_[:,:-1], axis=0).argsort()[1]
+    answers[1] = np.sum(attitude_matrix_[:, :-1], axis=0).argsort()[1]
+    answers[2] = attitude_matrix_[:, -1].argsort()[1]
+    answers[3] = attitude_matrix_[:, -1].argsort()[1]
     return answers
 
 
@@ -178,7 +193,16 @@ for subject_id, a in x.items():
                 answers = task_from_matrix(real_matrix[section_id])
                 c['real_matrix'] = str(int(answers[int(turn[-1])]))
 
+
+                #second best answer:
+                answers = task_from_matrix_second_best(attitude_matrix)
+                c['learned_matrix_second_best'] = str(int(answers[int(turn[-1])]))
+
+                answers = task_from_matrix_second_best(real_matrix[section_id])
+                c['real_matrix_second_best']    = str(int(answers[int(turn[-1])]))
+
                 tasks.append(c)
+
 
             else: # analyze behavior and resulting matrix / learning
                 j_robot = c['main'] # robot acting on

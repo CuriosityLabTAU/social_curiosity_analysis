@@ -3,17 +3,20 @@ from factor_analyzer import FactorAnalyzer
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as sm
+import seaborn as sns
+sns.set()
 
 
 # load data
 # MATAN:
-# data_path = 'data/'
-# filename = 'robot_interaction_data/raw_data_25-09-2018_09:30'
-# beh_rel_prob = pd.read_csv(data_path + 'amt_probs/probs_from_AMT.csv').values
+data_path = 'data/external_and_internal_data'
+external_filename = '/all_external_data.csv'
+internal_filename = '/all_internal_data.csv'
+
 # GOREN:
-data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-external_filename = 'all_data/all_external_data.csv'
-internal_filename = 'all_data/all_internal_data.csv'
+# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+# external_filename = 'all_data/all_external_data.csv'
+# internal_filename = 'all_data/all_internal_data.csv'
 # filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
 
 all_external = pd.read_csv(open(data_path + external_filename))
@@ -56,6 +59,8 @@ def the_fa(all_measures_, n_factors=-1):
 # select number of factors
 def scree_plot(fa_):
     ev, v = fa_.get_eigenvalues()
+    plt.xlabel('Factor Number')
+    plt.ylabel('Eigenvalue')
     plt.plot(ev)
     plt.show()
 

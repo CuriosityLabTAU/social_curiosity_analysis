@@ -12,7 +12,7 @@ from matplotlib.ticker import MaxNLocator
 
 # #Matan lab
 external_filename = 'data/all_external_data.csv'
-internal_filename = 'data/all_internal_data.csv'
+internal_filename = 'data/external_and_internal_data/all_internal_data.csv'
 
 #Goren
 # data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
@@ -166,7 +166,7 @@ def b_over_time():
     # print 'b_sequence vs time '
     # result = sm.ols(formula='Time ~ Score ', data=b_sequence_data).fit()
     # print result.summary()
-b_over_time()
+# b_over_time()
 
 def delta_over_time():
     a_color='teal'
@@ -206,6 +206,8 @@ def delta_over_time():
     # ax.axes.set_title(r'(b)', **title_font )
 
     random = (1.0 / 3 + 1.0 / 2) * 2
+    # random = (1.5 / 3 + 1.5 / 2 ) * 2
+
 
     ax.axhline(linewidth=1.3, color='r', y=random, linestyle=":")
     a.text(1.5, random +0.02, 'Random', horizontalalignment='right', color='r',
@@ -228,52 +230,53 @@ def delta_over_time():
     plt.show()
 
 
-    # print 'delta vs time '
-    # result = sm.ols(formula='Time ~ Score ', data=delta_data).fit()
-    # print result.summary()
-    #
-    # print 'tilde_tilde vs time '
-    # result = sm.ols(formula='Time ~ Score ', data=delta_tilde_data).fit()
-    # print result.summary()
-    #
-    # delta_list=['delta_0','delta_1','delta_2','delta_3','delta_4']
-    # delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1','delta_tilde_2' ,'delta_tilde_3', 'delta_tilde_4']
-    #
-    # tt_dict={}
-    # for i in range(5):
-    #     B=all_internal[delta_list[i]].values.tolist()
-    #     C=all_internal[delta_tilde_list[i]].values.tolist()
-    #
-    #     ttb=stats.ttest_ind(B, [random]*len(B))
-    #     ttc=stats.ttest_ind(C, [random]*len(C))
-    #
-    #     tt_dict[i]={'delta -t':ttb[0],'delta -p':ttb[1]/2,'delta~ -t':ttc[0],'delta~ -p':ttc[1]/2}
-    #
-    # tt_df = pd.DataFrame.from_dict(tt_dict, orient='index')
-    # print tt_df
-delta_over_time()
+    print 'delta vs time '
+    result = sm.ols(formula='Time ~ Score ', data=delta_data).fit()
+    print result.summary()
+
+    print 'tilde_tilde vs time '
+    result = sm.ols(formula='Time ~ Score ', data=delta_tilde_data).fit()
+    print result.summary()
+
+    delta_list=['delta_0','delta_1','delta_2','delta_3','delta_4']
+    delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1','delta_tilde_2' ,'delta_tilde_3', 'delta_tilde_4']
+
+    tt_dict={}
+    for i in range(5):
+        B=all_internal[delta_list[i]].values.tolist()
+        C=all_internal[delta_tilde_list[i]].values.tolist()
+
+        ttb=stats.ttest_ind(B, [random]*len(B))
+        ttc=stats.ttest_ind(C, [random]*len(C))
+
+        tt_dict[i]={'delta -t':ttb[0],'delta -p':ttb[1]/2,'delta~ -t':ttc[0],'delta~ -p':ttc[1]/2}
+
+    tt_df = pd.DataFrame.from_dict(tt_dict, orient='index')
+    print tt_df
+# delta_over_time()
 
 def delta_tilde_vs_b():
-    b_error_list=['b_error_0','b_error_1','b_error_2','b_error_3','b_error_4']
-    # b_local_list = ['b_local_0', 'b_local_1', 'b_local_2', 'b_local_3', 'b_local_4']
+    # b_error_list=['b_error_0','b_error_1','b_error_2','b_error_3','b_error_4']
+    b_local_list = ['b_local_0', 'b_local_1', 'b_local_2', 'b_local_3', 'b_local_4']
     delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1', 'delta_tilde_2', 'delta_tilde_3', 'delta_tilde_4']
 
     f, axes = plt.subplots(3, 2)
 
     for i in range(5):
-        data= all_internal[[b_error_list[i],delta_tilde_list[i]]]
+        data= all_internal[[b_local_list[i],delta_tilde_list[i]]]
 
-        a = sns.regplot(x=b_error_list[i], y=delta_tilde_list[i], data=data, x_estimator=np.mean ,ax=axes[int(i / 2), i % 2],)
+        a = sns.regplot(x=b_local_list[i], y=delta_tilde_list[i], data=data, x_estimator=np.mean ,ax=axes[int(i / 2), i % 2],)
         title=r"$\delta$~_"+str(i)+" vs "+r"$\beta_{\rm error}$_"+str(i)
         a.set(xlabel='Relationship Representation ', ylabel='Frequency',)
         a.axes.set_title(title)
 
         print title
-        result = sm.ols(formula=b_error_list[i]+'~'+delta_tilde_list[i], data=data).fit()
+        result = sm.ols(formula=b_local_list[i]+'~'+delta_tilde_list[i], data=data).fit()
         print result.summary()
 
     plt.show()
 
+# delta_tilde_vs_b()
 
 def delta_tag_vs_error():
     data = {
@@ -281,7 +284,7 @@ def delta_tag_vs_error():
         'y': []
     }
     for i in range(3, 4):
-        data['x'].extend([j[0] for j in all_internal[['b_local_%d' % i]].values.tolist()])
+        data['x'].extend([j[0] for j in all_internal[['b_global_%d' % i]].values.tolist()])
         data['y'].extend([j[0] for j in all_internal[['delta_tilde_%d' % i]].values.tolist()])
     df = pd.DataFrame.from_dict(data=data)
     print(df.head())
