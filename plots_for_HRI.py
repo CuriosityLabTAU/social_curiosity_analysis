@@ -11,13 +11,15 @@ from scipy import stats
 from matplotlib.ticker import MaxNLocator
 
 # #Matan lab
-external_filename = 'data/all_external_data.csv'
-internal_filename = 'data/external_and_internal_data/all_internal_data.csv'
+# external_filename = 'data/all_external_data.csv'
+# internal_filename = 'data/external_and_internal_data/all_internal_data.csv'
+
 
 #Goren
-# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-# external_filename = data_path+'all_data/all_external_data.csv'
+data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+external_filename = data_path+'all_data/all_external_data.csv'
 # internal_filename = data_path+'all_data/all_internal_data.csv'
+internal_filename = data_path+'study_2/all_internal_data.csv'
 
 
 all_internal = pd.read_csv(open(internal_filename))
@@ -183,13 +185,16 @@ def delta_over_time():
     delta_tag_list = ['delta_tag_0', 'delta_tag_1','delta_tag_2' ,'delta_tag_3', 'delta_tag_4']
 
     delta_tag_data= all_internal[delta_tag_list]
+    print(delta_tag_data)
     delta_tag_data.columns = [i for i in xrange(1,6)]
     delta_tag_data = pd.melt(delta_tag_data, var_name="Time", value_name="Score")
+
 
     c = sns.regplot(x="Time", y="Score", data=delta_tag_data,color=b_color , x_estimator=np.mean, label=r"$\hat{l}$", line_kws={'linestyle':"-."})
 
 
     delta_data= all_internal[delta_list]
+    print(delta_data)
     delta_data.columns = [i for i in xrange(1,6)]
     delta_data = pd.melt(delta_data, var_name="Time", value_name="Score")
 
@@ -198,6 +203,7 @@ def delta_over_time():
     delta_tilde_data= all_internal[delta_tilde_list]
     delta_tilde_data.columns = [i for i in xrange(1,6)]
     delta_tilde_data = pd.melt(delta_tilde_data, var_name="Time", value_name="Score")
+    print(delta_tilde_data)
 
 
     b = sns.regplot(x="Time", y="Score", data=delta_tilde_data, color=c_color , x_estimator=np.mean,label=r"$\tilde{l}$",line_kws={'linestyle':'-'})
@@ -253,12 +259,17 @@ def delta_over_time():
 
     tt_df = pd.DataFrame.from_dict(tt_dict, orient='index')
     print tt_df
-# delta_over_time()
+delta_over_time()
 
 def delta_tilde_vs_b():
-    # b_error_list=['b_error_0','b_error_1','b_error_2','b_error_3','b_error_4']
-    b_local_list = ['b_local_0', 'b_local_1', 'b_local_2', 'b_local_3', 'b_local_4']
-    delta_tilde_list = ['delta_tilde_0', 'delta_tilde_1', 'delta_tilde_2', 'delta_tilde_3', 'delta_tilde_4']
+
+    for b in ['local_', 'global_']:
+        for l in ['', 'tilde_', 'tag_']:
+            b_list=['b_' + b + str(i) for i in range(1,5)]
+            delta_list = ['delta_' + l + str(i) for i in range(1,5)]
+
+            for i in range(1, 5):
+                data= all_internal[[b_list[i],delta_list[i]]]
 
     f, axes = plt.subplots(3, 2)
 
@@ -266,6 +277,8 @@ def delta_tilde_vs_b():
         data= all_internal[[b_local_list[i],delta_tilde_list[i]]]
 
         a = sns.regplot(x=b_local_list[i], y=delta_tilde_list[i], data=data, x_estimator=np.mean ,ax=axes[int(i / 2), i % 2],)
+        f, axes = plt.subplots(3, 2)
+        a = sns.regplot(x=b_error_list[i], y=delta_tilde_list[i], data=data, x_estimator=np.mean ,ax=axes[int(i / 2), i % 2],)
         title=r"$\delta$~_"+str(i)+" vs "+r"$\beta_{\rm error}$_"+str(i)
         a.set(xlabel='Relationship Representation ', ylabel='Frequency',)
         a.axes.set_title(title)
@@ -275,23 +288,24 @@ def delta_tilde_vs_b():
         print result.summary()
 
     plt.show()
-
 # delta_tilde_vs_b()
 
-def delta_tag_vs_error():
-    data = {
-        'x': [],
-        'y': []
-    }
-    for i in range(3, 4):
-        data['x'].extend([j[0] for j in all_internal[['b_global_%d' % i]].values.tolist()])
-        data['y'].extend([j[0] for j in all_internal[['delta_tilde_%d' % i]].values.tolist()])
-    df = pd.DataFrame.from_dict(data=data)
-    print(df.head())
-    a = sns.regplot(x='x', y='y', x_estimator=np.mean, data=df)
+def delta_vs_b():
+    for b in ['local_', 'global_']:
+        for l in ['', 'tilde_', 'tag_']:
+            data = {
+                'x': [],
+                'y': []
+            }
+            for i in range(1, 5):
+                data['x'].extend([j[0] for j in all_internal[['b_' + b + str(i)]].values.tolist()])
+                data['y'].extend([j[0] for j in all_internal[['delta_' + l + str(i)]].values.tolist()])
+            df = pd.DataFrame.from_dict(data=data)
 
-    result = sm.ols(formula='y ~ x', data=df).fit()
-    print result.summary()
-    plt.show()
+            result = sm.ols(formula='y ~ x', data=df).fit()
+            print result.summary()
 
-# delta_tag_vs_error()
+            a = sns.regplot(x='x', y='y', x_estimator=np.mean, data=df)
+            plt.title(l + 'vs_' + b + ', R=%2.3f, p=%2.3f' % (result.rsquared, result.f_pvalue))
+            plt.show()
+# delta_vs_b()

@@ -8,30 +8,16 @@ sns.set()
 
 # load data
 # MATAN:
-data_path = 'data/'
-filename = 'robot_interaction_data/raw_data_28-09-2018_18:27'
-beh_rel_prob = pd.read_csv('data/amt_probs/probs_from_AMT.csv').values
-output_path = 'data/external_and_internal_data/all_internal_data.csv'
+# data_path = 'data/'
+# filename = 'robot_interaction_data/raw_data_28-09-2018_18:27'
+# beh_rel_prob = pd.read_csv('data/amt_probs/probs_from_AMT.csv').values
+# output_path = 'data/external_and_internal_data/all_internal_data.csv'
 
 # GOREN:
-# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-# filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
-# # filename = 'all_data/raw_data_28-09-2018_18_27'
-# output_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/all_data/all_internal_data.csv'
-# beh_rel_prob = pd.read_csv(data_path + 'probs_from_AMT.csv').values[:, 1:]
-
-x = pickle.load(open(data_path+filename, 'rb'))
-
-measures_list = []
-
-# load behavior_relationship probability
-
-num_discrete = beh_rel_prob.shape[1]
-num_behaviors = beh_rel_prob.shape[0]
+data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
 
 # real_matrix
-def bin_matrix(_matrix):
-    number_of_bins = 9
+def bin_matrix(_matrix, number_of_bins=3):
     bins = [i * (1.0 / number_of_bins) for i in xrange(number_of_bins + 1)]
     labels = [(bins[i] + bins[i + 1]) / 2.0 for i in xrange(number_of_bins)]
     labels = list(np.around(np.array(labels), 3))
@@ -48,11 +34,51 @@ def bin_matrix(_matrix):
 
     return matrix
 
-real_matrix = [bin_matrix(np.array([[0 , 0.7 , 0.9 , 0.9],[0.9 , 0  ,0.1  ,0.5],[0.7,0.1,0,0.1]])),
-               bin_matrix(np.array([[0, 0.75, 0.45, 0.1], [0.9, 0, 0.15, 0.5], [0.6, 0.3, 0, 0.9]])),
-               bin_matrix(np.array([[0, 0.9, 0.15, 0.5], [0.75, 0, 0.45, 0.9], [0.3, 0.6, 0, 0.1]])),
-               bin_matrix(np.array([[0, 0.45, 0.75, 0.5], [0.6, 0, 0.3, 0.1], [0.9, 0.15, 0, 0.9]])),
-               bin_matrix(np.array([[0, 0.3, 0.6, 0.9], [0.15, 0, 0.9, 0.1], [0.45, 0.75, 0, 0.5]]))]
+# filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
+# filename = 'all_data/raw_data_28-09-2018_18_27'
+# output_path = data_path + 'all_data/all_internal_data.csv'
+# beh_rel_prob_filename = data_path + 'probs_from_AMTn.csv'
+# real_matrix = [bin_matrix(np.array([[0, 0.7, 0.9, 0.9], [0.9, 0, 0.1, 0.5], [0.7, 0.1, 0, 0.1]])),
+#                bin_matrix(np.array([[0, 0.75, 0.45, 0.1], [0.9, 0, 0.15, 0.5], [0.6, 0.3, 0, 0.9]])),
+#                bin_matrix(np.array([[0, 0.9, 0.15, 0.5], [0.75, 0, 0.45, 0.9], [0.3, 0.6, 0, 0.1]])),
+#                bin_matrix(np.array([[0, 0.45, 0.75, 0.5], [0.6, 0, 0.3, 0.1], [0.9, 0.15, 0, 0.9]])),
+#                bin_matrix(np.array([[0, 0.3, 0.6, 0.9], [0.15, 0, 0.9, 0.1], [0.45, 0.75, 0, 0.5]]))]
+
+# filename = 'study_2/processed_data21-01-2019_13_40'
+# filename = 'study_2/RAW+PROCESSED 10.2.19/processed/processed_data10-02-2019_17_36'
+# filename = 'study_2/processed_data14-02-2019_18_09'
+filename = 'study_2/SC 21.2.9/21.2.9/processed/processed_data21-02-2019_18_42'
+output_path = data_path + 'study_2/all_internal_data_Feb26.csv'
+beh_rel_prob_filename = data_path + 'study_2/probs_from_AMT_origin.csv'
+real_matrix = [np.array([[0.5, 0.5, 0, 0], [0, 0.5, 0.5, 0.5], [1, 1, 0.5, 1]]),
+               np.array([[0.5, 0, 0.5, 0], [1, 0.5, 1, 1], [0, 0.5, 0.5, 0.5]]),
+               np.array([[0.5, 0.5, 0, 0.5], [1, 0.5, 1, 1], [0.5, 0, 0.5, 0]]),
+               np.array([[0.5, 0, 0.5, 0.5], [0.5, 0.5, 0, 0], [1, 1, 0.5, 1]]),
+               np.array([[0.5, 1, 1, 1], [0.5, 0.5, 0, 0.5], [0, 0.5, 0.5, 0]]),
+               np.array([[0.5, 1, 1, 1], [0.5, 0.5, 0.5, 0], [0, 0, 0.5, 0.5]])]
+
+
+def read_beh_rel_prob(beh_rel_prob_filename_):
+    beh_rel_prob_ = pd.read_csv(beh_rel_prob_filename_).values
+    beh_map_ = {}
+    for i in range(beh_rel_prob_.shape[0]):
+        beh_map_[int(beh_rel_prob_[i,0])] = i
+    return beh_rel_prob_[:, 1:], beh_map_
+
+beh_rel_prob, beh_map = read_beh_rel_prob(beh_rel_prob_filename)
+
+x = pickle.load(open(data_path+filename, 'rb'))
+
+measures_list = []
+
+# load behavior_relationship probability
+
+num_discrete = beh_rel_prob.shape[1]
+num_behaviors = beh_rel_prob.shape[0]
+
+
+
+
 
 
 def linear_regression_from_df(data,m_name):
@@ -71,13 +97,16 @@ def linear_regression_from_df(data,m_name):
         y=np.delete(y, none_index, 0)
         x=np.delete(x, none_index, 0)
         #start from 0:
-        y=y-y[0]
+        if len(y) > 0:
+            y=y-y[0]
 
-        # crate x for a non intercepted linear regressio
-        x = x[:, np.newaxis]
+            # crate x for a non intercepted linear regressio
+            x = x[:, np.newaxis]
 
-        #run linear regression
-        m, _, _, _ = np.linalg.lstsq(x, y)
+            #run linear regression
+            m, _, _, _ = np.linalg.lstsq(x, y)
+        else:
+            m = np.nan
         m_list.append(m)
         subjects.append(row[0])
 
@@ -100,7 +129,7 @@ def task_performance(tasks_, which_matrix, which_answer='subject_answer'):
 
 
 def update_bayes(prob_i_j_, i_robot_, j_robot_, behavior_):
-    prob_i_j_[i_robot_, j_robot_, :] = np.multiply(prob_i_j_[i_robot_, j_robot_, :], beh_rel_prob[behavior_, :])
+    prob_i_j_[i_robot_, j_robot_, :] = np.multiply(prob_i_j_[i_robot_, j_robot_, :], beh_rel_prob[beh_map[behavior_], :])
     norm = np.sum(prob_i_j_[i_robot_, j_robot_, :])
     prob_i_j_[i_robot_, j_robot_, :] /= norm
     return prob_i_j_
@@ -166,7 +195,7 @@ for subject_id, a in x.items():
         sequence_error = [np.mean(np.power(attitude_matrix[:] - real_matrix[section_id][:], 2.0))]
         the_sequence = []
         for turn, c in b.items():
-            if 'q' not in str(turn):
+            if type(turn) == int:
                 j_robot = c['main']  # robot acting on
                 if j_robot == 'h':
                     j_robot = 3
@@ -204,7 +233,8 @@ for subject_id, a in x.items():
                 tasks.append(c)
 
 
-            else: # analyze behavior and resulting matrix / learning
+            elif type(turn) == int:
+                # analyze behavior and resulting matrix / learning
                 j_robot = c['main'] # robot acting on
                 if j_robot == 'h':
                     j_robot = 3
@@ -322,10 +352,10 @@ for subject_id, a in x.items():
         # dict_for_measure_df[subject_id]['b_sequence_'+str(section_id)]     =  np.mean(error - sequence_error)
 
         plt.cla()
-        a = sns.lineplot(data=error, label='error')
-        b = sns.lineplot(data=local_error,    label=r"$\beta_{\rm local}$")
-        c = sns.lineplot(data=global_error,   label=r"$\beta_{\rm global}$")
-        d = sns.lineplot(data=sequence_error, label=r"$\beta_{\rm sequence}$")
+        a_plt = sns.lineplot(data=error, label='error')
+        b_plt = sns.lineplot(data=local_error,    label=r"$\beta_{\rm local}$")
+        c_plt = sns.lineplot(data=global_error,   label=r"$\beta_{\rm global}$")
+        d_plt = sns.lineplot(data=sequence_error, label=r"$\beta_{\rm sequence}$")
 
         ax.set(xlabel='Time', ylabel='error',title= 'subject_id: '+str(subject_id)+" , "+'section_id: '+str(section_id))
 
@@ -374,6 +404,8 @@ def figure_1():
     plt.plot(np.arange(5), np.mean(data_for_improving, axis=1))
     plt.show()
 
+
+figure_1()
 # statistical test: binomial between first and last (?)
 
 # - given behavior (?) in each section (over turns) --> what does the matrix look like? [DONE]

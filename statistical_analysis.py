@@ -9,14 +9,14 @@ sns.set()
 
 # load data
 # MATAN:
-data_path = 'data/external_and_internal_data'
-external_filename = '/all_external_data.csv'
-internal_filename = '/all_internal_data.csv'
+# data_path = 'data/external_and_internal_data'
+# external_filename = '/all_external_data.csv'
+# internal_filename = '/all_internal_data.csv'
 
 # GOREN:
-# data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
-# external_filename = 'all_data/all_external_data.csv'
-# internal_filename = 'all_data/all_internal_data.csv'
+data_path = 'C:/Goren/CuriosityLab/Data/social_curiosity/'
+external_filename = 'study_2/all_external_data_no_hebrew.csv'
+internal_filename = 'study_2/all_internal_data.csv'
 # filename = 'raw_data_18-09-2018_03_33/raw_data_18-09-2018_03_33'
 
 all_external = pd.read_csv(open(data_path + external_filename))
@@ -34,13 +34,13 @@ print(all_data.shape)
 
 interesting_measures = [
     'S_Curiosity', 'T_Curiosity',
-    'SCS_total_score', 'General_Social_Curiosity', '_5DC_Social_Curiosity',
-    'Covert_Social_Curiosity',
+    'SCS_total_score', 'General_Social_Curiosity', 'Covert_Social_Curiosity',
+    '_5DC_Social_Curiosity',
     '_5DC_Joyous_Exploration', '_5DC_Deprivation_Sensitivity',
     '_5DC_Stress_Tolerance', '_5DC_Thrill_Seeking',
     'CEI_2_total_score', 'AQ_total_score',
-    'pet', 'avg_grades',
-    'Openness', 'Neuroticism', 'Extraversion', 'Agreeableness', 'Conscientiousness'
+    'Openness', 'Neuroticism', 'Extraversion', 'Agreeableness', 'Conscientiousness',
+    'pet', 'avg_grades'
 ]
 
 # Factor analysis
@@ -93,6 +93,38 @@ def factor_scores(all_measures_, fa_, n_factors=4):
     return factor_df_
 
 
+def get_stars_from_p(p):
+    if p < 0.001:
+        return '{}^{***}'
+    if p < 0.01:
+        return '{}^{**}'
+    if p < 0.05:
+        return '{}^{*}'
+    return ''
+
+
+def results_to_paper(result_):
+    # print(result_.summary())
+
+    s = '$'
+    for i in range(1, len(result_.params.keys())):
+        p_string = get_stars_from_p(result_.pvalues[i])
+        if '*' in p_string:
+            if i == 1:
+                s = '{\\boldmath$\\beta$}$\\mathbf{_{%s}=%2.1f%s},' % (result_.params.keys()[i], result_.params[i], p_string)
+            else:
+                s += '${\\boldmath$\\beta$}$\\mathbf{_{%s}=%2.1f%s},' % (result_.params.keys()[i], result_.params[i], p_string)
+        else:
+            s += '\\beta_{%s}=%2.1f%s,' % (result_.params.keys()[i], result_.params[i], p_string)
+
+    p_string = get_stars_from_p(result_.f_pvalue)
+    if '*' in p_string:
+        s += '\\mathbf{R^2=%2.2f%s}$' % (result_.rsquared, get_stars_from_p(result_.f_pvalue))
+    else:
+        s += 'R^2=%2.2f%s$' % (result_.rsquared, get_stars_from_p(result_.f_pvalue))
+
+    return s
+
 def calc_correlation(all_measures_, factor_names):
     ylabel_map = {
         'psychometric_grade': 'PET',
@@ -101,27 +133,29 @@ def calc_correlation(all_measures_, factor_names):
     }
 
     for i_m in interesting_measures:
-        print(' ***************************************************** ')
-        print(' ***************************************************** ')
-        print(' ***************************************************** ')
+        # print(' ***************************************************** ')
+        # print(' ***************************************************** ')
+        # print(' ***************************************************** ')
+        paper_string = ''
+
         the_formula = i_m + ' ~ '
         for fn in factor_names:
             the_formula += fn + ' +'
         the_formula = the_formula[:-2]
-        print(the_formula)
+        # print(the_formula)
         result = sm.ols(formula=the_formula, data=all_measures_).fit()
-        print result.summary()
+        # print result.summary()
 
         most_significant_factor = np.argmin(result.pvalues[1:].values)
 
         result = sm.ols(formula='%s ~ %s' % (i_m, factor_names[most_significant_factor]), data=all_measures_).fit()
-        print result.summary()
+        paper_string += results_to_paper(result) + '\t &'
 
         two_factor = {}
         for fn in factor_names:
             if fn != factor_names[most_significant_factor]:
                 the_formula = i_m + ' ~ %s + %s' % (factor_names[most_significant_factor], fn)
-                print(the_formula)
+                # print(the_formula)
                 result = sm.ols(formula=the_formula, data=all_measures_).fit()
                 # print result.summary()
                 two_factor[result.f_pvalue] = (factor_names[most_significant_factor], fn)
@@ -130,30 +164,35 @@ def calc_correlation(all_measures_, factor_names):
         best_two_factors = two_factor[best_p_value]
 
         the_formula = i_m + ' ~ %s + %s' % (best_two_factors[0], best_two_factors[1])
-        print(the_formula)
+        # print(the_formula)
         result = sm.ols(formula=the_formula, data=all_measures_).fit()
-        print result.summary()
+        paper_string += results_to_paper(result) + '\t &'
 
         the_formula = i_m + ' ~ %s * %s' % (best_two_factors[0], best_two_factors[1])
-        print(the_formula)
+        # print(the_formula)
         result = sm.ols(formula=the_formula, data=all_measures_).fit()
-        print result.summary()
+        paper_string += results_to_paper(result) + '\\\\\\hline'
 
-        if 'Factor' in best_two_factors[0]:
-            best_measure = np.argmax(abs(fa.loadings[best_two_factors[0]]))
-            the_formula = i_m + ' ~ %s + %s' % (best_measure, best_two_factors[1])
-            print(the_formula)
-            result = sm.ols(formula=the_formula, data=all_measures_).fit()
-            print result.summary()
+        # if 'Factor' in best_two_factors[0]:
+        #     best_measure = np.argmax(abs(fa.loadings[best_two_factors[0]]))
+        #     the_formula = i_m + ' ~ %s + %s' % (best_measure, best_two_factors[1])
+        #     # print(the_formula)
+        #     result = sm.ols(formula=the_formula, data=all_measures_).fit()
+        #     results_to_paper(result)
+        #
+        # if 'Factor' in best_two_factors[1]:
+        #     best_measure = np.argmax(abs(fa.loadings[best_two_factors[1]]))
+        #     the_formula = i_m + ' ~ %s + %s' % (best_measure, best_two_factors[0])
+        #     # print(the_formula)
+        #     result = sm.ols(formula=the_formula, data=all_measures_).fit()
+        #     results_to_paper(result)
 
-        if 'Factor' in best_two_factors[1]:
-            best_measure = np.argmax(abs(fa.loadings[best_two_factors[1]]))
-            the_formula = i_m + ' ~ %s + %s' % (best_measure, best_two_factors[0])
-            print(the_formula)
-            result = sm.ols(formula=the_formula, data=all_measures_).fit()
-            print result.summary()
-
-
+        paper_string = paper_string.replace('Factor', '')
+        if '*' in paper_string:
+            paper_string = '{\\bf ' + i_m.replace('_', '\\_') + '}\t & ' + paper_string
+        else:
+            paper_string = i_m.replace('_', '\\_') + '\t & ' + paper_string
+        print(paper_string)
 
 
 
